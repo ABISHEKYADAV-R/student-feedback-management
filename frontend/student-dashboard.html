@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard - Smart Feedback System</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-brand">&#127979; Smart Feedback System</div>
+      <div class="nav-right">
+        <span class="nav-user" id="navUser"></span>
+        <button class="btn btn-outline btn-sm" onclick="logout()">
+          Logout
+        </button>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="page-header">
+        <h2>Student Dashboard</h2>
+        <p>Submit anonymous feedback and suggestions for your courses.</p>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="feedback">
+          Submit Feedback
+        </button>
+        <button class="tab-btn" data-tab="suggestion">Submit Suggestion</button>
+        <button class="tab-btn" data-tab="improvements">
+          View Improvements
+        </button>
+      </div>
+
+      <!-- ── Tab: Submit Feedback ── -->
+      <div class="tab-content active" id="tab-feedback">
+        <div class="card">
+          <h3>Submit Anonymous Feedback</h3>
+          <p class="text-muted">
+            Your identity will not be stored. Be honest and constructive.
+          </p>
+
+          <form id="feedbackForm">
+            <div class="form-group">
+              <label for="fb_course">Select Course</label>
+              <select id="fb_course" required>
+                <option value="">-- Select a course --</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Rating (1 = Poor, 5 = Excellent)</label>
+              <div class="star-rating" id="starRating">
+                <span class="star" data-val="1">&#9733;</span>
+                <span class="star" data-val="2">&#9733;</span>
+                <span class="star" data-val="3">&#9733;</span>
+                <span class="star" data-val="4">&#9733;</span>
+                <span class="star" data-val="5">&#9733;</span>
+              </div>
+              <input type="hidden" id="fb_rating" value="" />
+            </div>
+
+            <div class="form-group">
+              <label for="fb_comment">Comment (optional)</label>
+              <textarea
+                id="fb_comment"
+                rows="4"
+                placeholder="Share your thoughts about this course..."></textarea>
+            </div>
+
+            <div id="fbMsg" class="alert hidden"></div>
+
+            <button type="submit" class="btn btn-primary">
+              Submit Feedback Anonymously
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── Tab: Submit Suggestion ── -->
+      <div class="tab-content" id="tab-suggestion">
+        <div class="card">
+          <h3>Submit Anonymous Suggestion</h3>
+          <p class="text-muted">
+            Help improve courses by sharing your suggestions.
+          </p>
+
+          <form id="suggestionForm">
+            <div class="form-group">
+              <label for="sg_course">Select Course</label>
+              <select id="sg_course" required>
+                <option value="">-- Select a course --</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="sg_text">Your Suggestion</label>
+              <textarea
+                id="sg_text"
+                rows="4"
+                placeholder="What improvements would you suggest?"
+                required></textarea>
+            </div>
+
+            <div id="sgMsg" class="alert hidden"></div>
+
+            <button type="submit" class="btn btn-primary">
+              Submit Suggestion Anonymously
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── Tab: Improvements ── -->
+      <div class="tab-content" id="tab-improvements">
+        <div class="card">
+          <h3>Improvements Made</h3>
+          <p class="text-muted">
+            Actions taken by the administration based on student feedback.
+          </p>
+
+          <div id="improvementsList">
+            <p class="loading">Loading improvements...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /container -->
+
+    <script src="js/student.js"></script>
+  </body>
+</html>

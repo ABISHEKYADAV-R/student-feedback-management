@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Smart Feedback System</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-brand">&#127979; Smart Feedback System</div>
+      <div class="nav-right">
+        <span class="nav-user" id="navUser"></span>
+        <button class="btn btn-outline btn-sm" onclick="logout()">
+          Logout
+        </button>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="page-header">
+        <h2>Admin Dashboard</h2>
+        <p>
+          Manage the feedback system, review statistics, and record actions.
+        </p>
+      </div>
+
+      <!-- Overview Stats -->
+      <div class="stats-grid" id="overviewStats">
+        <div class="stat-card loading-card">Loading...</div>
+      </div>
+
+      <!-- Rating Breakdown -->
+      <div class="card">
+        <h3>Rating Breakdown</h3>
+        <div id="ratingBars"></div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="courses">Courses</button>
+        <button class="tab-btn" data-tab="actions">Actions</button>
+        <button class="tab-btn" data-tab="suggestions">Suggestions</button>
+        <button class="tab-btn" data-tab="addCourse">Add Course</button>
+        <button class="tab-btn" data-tab="recordAction">Record Action</button>
+      </div>
+
+      <!-- ── Tab: Courses ── -->
+      <div class="tab-content active" id="tab-courses">
+        <div class="card">
+          <h3>All Courses</h3>
+          <div id="courseTable"><p class="loading">Loading...</p></div>
+        </div>
+      </div>
+
+      <!-- ── Tab: Actions ── -->
+      <div class="tab-content" id="tab-actions">
+        <div class="card">
+          <div class="card-header-row">
+            <h3>Actions Recorded</h3>
+            <div class="filter-row">
+              <label>Filter by status:</label>
+              <select
+                id="actionStatusFilter"
+                onchange="filterActions(this.value)">
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="in-progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
+          </div>
+          <div id="actionsList"><p class="loading">Loading...</p></div>
+        </div>
+      </div>
+
+      <!-- ── Tab: Suggestions ── -->
+      <div class="tab-content" id="tab-suggestions">
+        <div class="card">
+          <h3>Student Suggestions</h3>
+          <div id="suggestionsList"><p class="loading">Loading...</p></div>
+        </div>
+      </div>
+
+      <!-- ── Tab: Add Course ── -->
+      <div class="tab-content" id="tab-addCourse">
+        <div class="card">
+          <h3>Add New Course</h3>
+          <form id="addCourseForm">
+            <div class="form-group">
+              <label for="ac_name">Course Name</label>
+              <input
+                type="text"
+                id="ac_name"
+                placeholder="e.g., Software Engineering 301"
+                required />
+            </div>
+            <div class="form-group">
+              <label for="ac_faculty">Assign Faculty</label>
+              <select id="ac_faculty">
+                <option value="">-- Unassigned --</option>
+              </select>
+            </div>
+            <div id="acMsg" class="alert hidden"></div>
+            <button type="submit" class="btn btn-primary">Add Course</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── Tab: Record Action ── -->
+      <div class="tab-content" id="tab-recordAction">
+        <div class="card">
+          <h3>Record Action on Feedback Issue</h3>
+          <form id="recordActionForm">
+            <div class="form-group">
+              <label for="ra_course">Select Course</label>
+              <select id="ra_course" required>
+                <option value="">-- Select a course --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ra_issue">Issue Description</label>
+              <textarea
+                id="ra_issue"
+                rows="3"
+                placeholder="Describe the feedback issue..."
+                required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="ra_action">Action Taken</label>
+              <textarea
+                id="ra_action"
+                rows="3"
+                placeholder="Describe what action was taken..."
+                required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="ra_status">Status</label>
+              <select id="ra_status">
+                <option value="pending">Pending</option>
+                <option value="in-progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
+            <div id="raMsg" class="alert hidden"></div>
+            <button type="submit" class="btn btn-primary">Record Action</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- /container -->
+
+    <script src="js/admin.js"></script>
+  </body>
+</html>

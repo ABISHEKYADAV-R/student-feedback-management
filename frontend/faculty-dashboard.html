@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Faculty Dashboard - Smart Feedback System</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-brand">&#127979; Smart Feedback System</div>
+      <div class="nav-right">
+        <span class="nav-user" id="navUser"></span>
+        <button class="btn btn-outline btn-sm" onclick="logout()">
+          Logout
+        </button>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="page-header">
+        <h2>Faculty Dashboard</h2>
+        <p>View feedback and ratings for your courses.</p>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="stats-grid" id="summaryCards">
+        <div class="stat-card loading-card">Loading...</div>
+      </div>
+
+      <!-- Feedback per course -->
+      <div class="card" id="courseDetailSection">
+        <h3>Course Feedback Details</h3>
+        <p class="text-muted" id="noDataMsg">No feedback data available yet.</p>
+
+        <div id="courseCards"></div>
+      </div>
+
+      <!-- Recent Comments -->
+      <div class="card">
+        <h3>Recent Student Comments</h3>
+        <p class="text-muted">Latest comments from students (anonymous).</p>
+        <div id="commentsList">
+          <p class="loading">Loading comments...</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/faculty.js"></script>
+  </body>
+</html>
