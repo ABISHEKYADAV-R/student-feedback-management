@@ -4,19 +4,49 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Smart Student Feedback System</title>
-    <meta name="theme-color" content="#4361ee" />
+    <meta name="theme-color" content="#6366f1" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body class="auth-page">
     <div class="auth-container">
-      <div class="auth-card">
-        <div class="auth-header">
-          <span class="logo-icon">&#127979;</span>
-          <h1>Smart Feedback System</h1>
-          <p>College Student Feedback Portal</p>
+      <div class="auth-header">
+        <span class="logo-icon">&#127979;</span>
+        <h1>Smart Feedback System</h1>
+        <p>A modern platform for college student feedback and analytics.</p>
+      </div>
+
+      <!-- Role Selection Screen -->
+      <div id="roleSelection" class="role-cards">
+        <div class="role-card" onclick="selectRole('student')">
+          <span class="role-icon">&#127891;</span>
+          <h3>Student</h3>
+          <p>Submit feedback and suggestions</p>
+        </div>
+        
+        <div class="role-card" onclick="selectRole('faculty')">
+          <span class="role-icon">&#128104;&#8205;&#127979;</span>
+          <h3>Faculty</h3>
+          <p>View course feedback & ratings</p>
+        </div>
+
+        <div class="role-card" onclick="selectRole('admin')">
+          <span class="role-icon">&#128187;</span>
+          <h3>Admin</h3>
+          <p>System analytics & management</p>
+        </div>
+      </div>
+
+      <!-- Login Form Screen (Hidden by default) -->
+      <div id="loginSection" class="login-form-container">
+        <div class="login-form-header">
+          <button class="back-btn" onclick="showRoleSelection()">&#8592; Back</button>
+          <h2><span id="loginRoleIcon"></span> <span id="loginRoleTitle">Student Login</span></h2>
         </div>
 
         <form id="loginForm" class="auth-form">
+          <!-- Hidden input to store role -->
+          <input type="hidden" id="role" value="" />
+
           <div class="form-group">
             <label for="email">Email Address</label>
             <input
@@ -45,32 +75,24 @@
               </button>
             </div>
           </div>
-          <div class="form-group">
-            <label for="role">Role</label>
-            <select id="role" required>
-              <option value="">Select your role</option>
-              <option value="student">Student</option>
-              <option value="faculty">Faculty</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
 
           <div id="loginError" class="alert alert-error hidden"></div>
 
           <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
-            Login
+            Sign In
           </button>
         </form>
 
         <div class="auth-footer">
-          <p style="margin-bottom: 8px; font-weight: 600; color: #475569">
+          <p style="margin-bottom: 8px; font-weight: 700; color: var(--text);">
             Demo Credentials
           </p>
-          <span class="cred-item">admin@college.com / admin123</span><br />
-          <span class="cred-item">smith@college.com / faculty123</span><br />
-          <span class="cred-item">alice@student.com / student123</span>
+          <div id="demoCredentialsList">
+            <!-- Will be populated by JS -->
+          </div>
         </div>
       </div>
+      
     </div>
 
     <script src="js/auth.js"></script>
