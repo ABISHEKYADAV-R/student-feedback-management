@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard - Smart Feedback System</title>
+    <meta name="theme-color" content="#4361ee" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
@@ -20,7 +21,7 @@
 
     <div class="container">
       <div class="page-header">
-        <h2>Admin Dashboard</h2>
+        <h2>&#128202; Admin Dashboard</h2>
         <p>
           Manage the feedback system, review statistics, and record actions.
         </p>
@@ -28,22 +29,32 @@
 
       <!-- Overview Stats -->
       <div class="stats-grid" id="overviewStats">
-        <div class="stat-card loading-card">Loading...</div>
+        <div class="stat-card loading-card">
+          <span class="spinner"></span> Loading...
+        </div>
       </div>
 
       <!-- Rating Breakdown -->
       <div class="card">
-        <h3>Rating Breakdown</h3>
-        <div id="ratingBars"></div>
+        <h3>&#11088; Rating Breakdown</h3>
+        <div id="ratingBars">
+          <p class="loading"><span class="spinner"></span> Loading...</p>
+        </div>
       </div>
 
       <!-- Tab Navigation -->
       <div class="tabs">
-        <button class="tab-btn active" data-tab="courses">Courses</button>
-        <button class="tab-btn" data-tab="actions">Actions</button>
-        <button class="tab-btn" data-tab="suggestions">Suggestions</button>
-        <button class="tab-btn" data-tab="addCourse">Add Course</button>
-        <button class="tab-btn" data-tab="recordAction">Record Action</button>
+        <button class="tab-btn active" data-tab="courses">
+          &#128218; Courses
+        </button>
+        <button class="tab-btn" data-tab="actions">&#9997; Actions</button>
+        <button class="tab-btn" data-tab="suggestions">
+          &#128161; Suggestions
+        </button>
+        <button class="tab-btn" data-tab="addCourse">&#43; Add Course</button>
+        <button class="tab-btn" data-tab="recordAction">
+          &#128203; Record Action
+        </button>
       </div>
 
       <!-- ── Tab: Courses ── -->

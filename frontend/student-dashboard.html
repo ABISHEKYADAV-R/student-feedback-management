@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Dashboard - Smart Feedback System</title>
+    <meta name="theme-color" content="#4361ee" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
@@ -18,20 +19,25 @@
       </div>
     </nav>
 
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <div class="container">
       <div class="page-header">
-        <h2>Student Dashboard</h2>
+        <h2>&#127891; Student Dashboard</h2>
         <p>Submit anonymous feedback and suggestions for your courses.</p>
       </div>
 
       <!-- Tab Navigation -->
       <div class="tabs">
         <button class="tab-btn active" data-tab="feedback">
-          Submit Feedback
+          &#11088; Submit Feedback
         </button>
-        <button class="tab-btn" data-tab="suggestion">Submit Suggestion</button>
+        <button class="tab-btn" data-tab="suggestion">
+          &#128161; Submit Suggestion
+        </button>
         <button class="tab-btn" data-tab="improvements">
-          View Improvements
+          &#9989; Improvements
         </button>
       </div>
 
@@ -47,12 +53,12 @@
             <div class="form-group">
               <label for="fb_course">Select Course</label>
               <select id="fb_course" required>
-                <option value="">-- Select a course --</option>
+                <option value="">-- Loading courses... --</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label>Rating (1 = Poor, 5 = Excellent)</label>
+              <label>Rating</label>
               <div class="star-rating" id="starRating">
                 <span class="star" data-val="1">&#9733;</span>
                 <span class="star" data-val="2">&#9733;</span>
@@ -60,11 +66,17 @@
                 <span class="star" data-val="4">&#9733;</span>
                 <span class="star" data-val="5">&#9733;</span>
               </div>
+              <div class="star-hint" id="starHint">Click a star to rate</div>
               <input type="hidden" id="fb_rating" value="" />
             </div>
 
             <div class="form-group">
-              <label for="fb_comment">Comment (optional)</label>
+              <label for="fb_comment"
+                >Comment
+                <span style="font-weight: 400; color: var(--text-muted)"
+                  >(optional)</span
+                ></label
+              >
               <textarea
                 id="fb_comment"
                 rows="4"
@@ -73,8 +85,8 @@
 
             <div id="fbMsg" class="alert hidden"></div>
 
-            <button type="submit" class="btn btn-primary">
-              Submit Feedback Anonymously
+            <button type="submit" class="btn btn-primary" id="fbBtn">
+              &#128274; Submit Anonymously
             </button>
           </form>
         </div>
@@ -84,9 +96,7 @@
       <div class="tab-content" id="tab-suggestion">
         <div class="card">
           <h3>Submit Anonymous Suggestion</h3>
-          <p class="text-muted">
-            Help improve courses by sharing your suggestions.
-          </p>
+          <p class="text-muted">Help improve courses by sharing your ideas.</p>
 
           <form id="suggestionForm">
             <div class="form-group">
@@ -100,15 +110,15 @@
               <label for="sg_text">Your Suggestion</label>
               <textarea
                 id="sg_text"
-                rows="4"
+                rows="5"
                 placeholder="What improvements would you suggest?"
                 required></textarea>
             </div>
 
             <div id="sgMsg" class="alert hidden"></div>
 
-            <button type="submit" class="btn btn-primary">
-              Submit Suggestion Anonymously
+            <button type="submit" class="btn btn-primary" id="sgBtn">
+              &#128274; Submit Anonymously
             </button>
           </form>
         </div>
@@ -117,13 +127,14 @@
       <!-- ── Tab: Improvements ── -->
       <div class="tab-content" id="tab-improvements">
         <div class="card">
-          <h3>Improvements Made</h3>
+          <h3>&#9989; Improvements Made</h3>
           <p class="text-muted">
-            Actions taken by the administration based on student feedback.
+            Actions taken by administration based on student feedback.
           </p>
-
           <div id="improvementsList">
-            <p class="loading">Loading improvements...</p>
+            <p class="loading">
+              <span class="spinner"></span>Loading improvements...
+            </p>
           </div>
         </div>
       </div>

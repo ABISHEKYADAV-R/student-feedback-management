@@ -2,7 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-require("dotenv").config();
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const app = express();
 
@@ -38,10 +38,35 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "frontend", "index.html"));
 });
 
-// ─── Start server ─────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-  console.log(`   Frontend: http://localhost:${PORT}`);
-  console.log(`   API:      http://localhost:${PORT}/api/health`);
-});
+// ─── Start server (initialize DB first) ───────────────────────────────────────
+const PORT = process.env.PORT || 5002;
+
+const initDb = require("./config/initDb");
+
+(async () => {
+  try {
+    await initDb();
+  } catch (err) {
+    console.error("❌ Database initialization failed:", err.message);
+    console.error("   Check your MySQL credentials in backend/.env");
+    process.exit(1);
+  }
+
+  function startServer(port) {
+    const server = app.listen(port, () => {
+      console.log(`🚀 Server running at http://localhost:${port}`);
+      console.log(`   Frontend: http://localhost:${port}`);
+      console.log(`   API:      http://localhost:${port}/api/health`);
+    });
+    server.on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        console.warn(`⚠️  Port ${port} is in use, trying port ${port + 1}...`);
+        startServer(port + 1);
+      } else {
+        console.error("❌ Server error:", err.message);
+        process.exit(1);
+      }
+    });
+  }
+  startServer(PORT);
+})();

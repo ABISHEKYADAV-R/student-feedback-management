@@ -7,12 +7,15 @@ require("dotenv").config();
 // POST /login
 async function login(req, res) {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password || !role) {
       return res
         .status(400)
-        .json({ success: false, message: "Email and password are required." });
+        .json({
+          success: false,
+          message: "Email, password, and role are required.",
+        });
     }
 
     // Find user by email
@@ -23,7 +26,7 @@ async function login(req, res) {
     if (rows.length === 0) {
       return res
         .status(401)
-        .json({ success: false, message: "Invalid email or password." });
+        .json({ success: false, message: "Invalid email, password, or role." });
     }
 
     const user = rows[0];
@@ -33,7 +36,16 @@ async function login(req, res) {
     if (!isMatch) {
       return res
         .status(401)
-        .json({ success: false, message: "Invalid email or password." });
+        .json({ success: false, message: "Invalid email, password, or role." });
+    }
+    // Check role matches
+    if (user.role !== role) {
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: "Selected role does not match your account.",
+        });
     }
 
     // Generate JWT
@@ -78,12 +90,10 @@ async function register(req, res) {
 
     const validRoles = ["student", "faculty", "admin"];
     if (!validRoles.includes(role)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Role must be student, faculty, or admin.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Role must be student, faculty, or admin.",
+      });
     }
 
     // Check duplicate email

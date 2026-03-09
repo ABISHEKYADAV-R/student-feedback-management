@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Faculty Dashboard - Smart Feedback System</title>
+    <meta name="theme-color" content="#4361ee" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
@@ -20,29 +21,32 @@
 
     <div class="container">
       <div class="page-header">
-        <h2>Faculty Dashboard</h2>
+        <h2>&#127891; Faculty Dashboard</h2>
         <p>View feedback and ratings for your courses.</p>
       </div>
 
       <!-- Summary Cards -->
       <div class="stats-grid" id="summaryCards">
-        <div class="stat-card loading-card">Loading...</div>
+        <div class="stat-card loading-card">
+          <span class="spinner"></span> Loading...
+        </div>
       </div>
 
       <!-- Feedback per course -->
-      <div class="card" id="courseDetailSection">
-        <h3>Course Feedback Details</h3>
+      <div class="card">
+        <h3>&#128218; Course Feedback Details</h3>
         <p class="text-muted" id="noDataMsg">No feedback data available yet.</p>
-
         <div id="courseCards"></div>
       </div>
 
       <!-- Recent Comments -->
       <div class="card">
-        <h3>Recent Student Comments</h3>
-        <p class="text-muted">Latest comments from students (anonymous).</p>
+        <h3>&#128172; Recent Student Comments</h3>
+        <p class="text-muted">Latest anonymous comments from students.</p>
         <div id="commentsList">
-          <p class="loading">Loading comments...</p>
+          <p class="loading">
+            <span class="spinner"></span> Loading comments...
+          </p>
         </div>
       </div>
     </div>

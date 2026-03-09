@@ -1,6 +1,18 @@
 // js/auth.js - Login page logic
-const API = "http://localhost:5000";
+const API = (window.location.protocol === "file:" || window.location.origin === "null") ? "http://localhost:5002" : window.location.origin;
 
+// ─── Password show/hide toggle ────────────────────────────────
+const toggleBtn = document.getElementById("togglePwd");
+const pwdInput = document.getElementById("password");
+if (toggleBtn && pwdInput) {
+  toggleBtn.addEventListener("click", () => {
+    const isText = pwdInput.type === "text";
+    pwdInput.type = isText ? "password" : "text";
+    toggleBtn.textContent = isText ? "👁" : "🙈";
+  });
+}
+
+// ─── Login form ───────────────────────────────────────────────
 document
   .getElementById("loginForm")
   .addEventListener("submit", async function (e) {
@@ -8,18 +20,25 @@ document
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
+    const role = document.getElementById("role").value;
     const errEl = document.getElementById("loginError");
     const btn = document.getElementById("loginBtn");
 
     errEl.classList.add("hidden");
     btn.disabled = true;
     btn.textContent = "Logging in...";
+    if (!role) {
+      showError(errEl, "Please select your role.");
+      btn.disabled = false;
+      btn.textContent = "Login";
+      return;
+    }
 
     try {
       const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, role }),
       });
 
       const data = await res.json();
@@ -52,7 +71,7 @@ function showError(el, msg) {
   el.className = "alert alert-error";
 }
 
-// If already logged in, redirect
+// ─── Redirect if already logged in ───────────────────────────
 (function checkExisting() {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "null");

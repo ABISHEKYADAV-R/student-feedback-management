@@ -4,13 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Smart Student Feedback System</title>
+    <meta name="theme-color" content="#4361ee" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body class="auth-page">
     <div class="auth-container">
       <div class="auth-card">
         <div class="auth-header">
-          <div class="logo-icon">&#127979;</div>
+          <span class="logo-icon">&#127979;</span>
           <h1>Smart Feedback System</h1>
           <p>College Student Feedback Portal</p>
         </div>
@@ -22,16 +23,36 @@
               type="email"
               id="email"
               placeholder="Enter your email"
+              autocomplete="email"
               required />
           </div>
 
           <div class="form-group">
             <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Enter your password"
-              required />
+            <div class="password-wrapper">
+              <input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required />
+              <button
+                type="button"
+                class="toggle-pwd"
+                id="togglePwd"
+                title="Show/hide password">
+                &#128065;
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="role">Role</label>
+            <select id="role" required>
+              <option value="">Select your role</option>
+              <option value="student">Student</option>
+              <option value="faculty">Faculty</option>
+              <option value="admin">Admin</option>
+            </select>
           </div>
 
           <div id="loginError" class="alert alert-error hidden"></div>
@@ -42,10 +63,12 @@
         </form>
 
         <div class="auth-footer">
-          <p>Demo credentials:</p>
-          <small>Admin: admin@college.com / admin123</small><br />
-          <small>Faculty: smith@college.com / faculty123</small><br />
-          <small>Student: alice@student.com / student123</small>
+          <p style="margin-bottom: 8px; font-weight: 600; color: #475569">
+            Demo Credentials
+          </p>
+          <span class="cred-item">admin@college.com / admin123</span><br />
+          <span class="cred-item">smith@college.com / faculty123</span><br />
+          <span class="cred-item">alice@student.com / student123</span>
         </div>
       </div>
     </div>

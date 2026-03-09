@@ -1,5 +1,5 @@
 // js/admin.js - Admin dashboard logic
-const API = "http://localhost:5000";
+const API = (window.location.protocol === "file:" || window.location.origin === "null") ? "http://localhost:5002" : window.location.origin;
 
 // ─── Auth guard ───────────────────────────────────────────────
 const token = localStorage.getItem("token");

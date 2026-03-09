@@ -1,5 +1,5 @@
 // js/faculty.js - Faculty dashboard logic
-const API = "http://localhost:5000";
+const API = (window.location.protocol === "file:" || window.location.origin === "null") ? "http://localhost:5002" : window.location.origin;
 
 // ─── Auth guard ───────────────────────────────────────────────
 const token = localStorage.getItem("token");
@@ -56,15 +56,19 @@ async function loadSummary() {
   document.getElementById("summaryCards").innerHTML = `
     <div class="stat-card">
       <div class="stat-value">${totalFeedback}</div>
-      <div class="stat-label">Total Feedback Received</div>
+      <div class="stat-label">Total Feedback</div>
     </div>
     <div class="stat-card green">
       <div class="stat-value">${avgAll}</div>
-      <div class="stat-label">Overall Avg Rating</div>
+      <div class="stat-label">Avg Rating</div>
     </div>
     <div class="stat-card orange">
       <div class="stat-value">${summary.length}</div>
       <div class="stat-label">Courses</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${comments.length}</div>
+      <div class="stat-label">Comments</div>
     </div>
   `;
 
@@ -79,33 +83,33 @@ async function loadSummary() {
     courseEl.innerHTML = summary
       .map(
         (c) => `
-      <div class="course-stat">
-        <div class="course-stat-name">${escHtml(c.course_name)}</div>
-        <div class="course-stat-info">
-          <div class="mini-stat">
-            <div class="val">${c.total_feedback || 0}</div>
-            <div class="lbl">Responses</div>
-          </div>
-          <div class="mini-stat">
-            <div class="val">${c.average_rating || "—"}</div>
-            <div class="lbl">Avg Rating</div>
-          </div>
-          <div class="mini-stat">
-            <div class="val">${c.lowest_rating || "—"}</div>
-            <div class="lbl">Lowest</div>
-          </div>
-          <div class="mini-stat">
-            <div class="val">${c.highest_rating || "—"}</div>
-            <div class="lbl">Highest</div>
+        <div class="course-stat">
+          <div class="course-stat-name">${escHtml(c.course_name)}</div>
+          <div class="course-stat-info">
+            <div class="mini-stat">
+              <div class="val">${c.total_feedback || 0}</div>
+              <div class="lbl">Responses</div>
+            </div>
+            <div class="mini-stat">
+              <div class="val">${c.average_rating || "—"}</div>
+              <div class="lbl">Avg Rating</div>
+            </div>
+            <div class="mini-stat">
+              <div class="val">${c.lowest_rating || "—"}</div>
+              <div class="lbl">Lowest</div>
+            </div>
+            <div class="mini-stat">
+              <div class="val">${c.highest_rating || "—"}</div>
+              <div class="lbl">Highest</div>
+            </div>
           </div>
         </div>
-      </div>
-    `,
+      `,
       )
       .join("");
   }
 
-  // ── Comments ──
+  // ── Comments (now show course name) ──
   const commentEl = document.getElementById("commentsList");
   if (comments.length === 0) {
     commentEl.innerHTML = '<p class="empty-msg">No comments yet.</p>';
@@ -113,14 +117,14 @@ async function loadSummary() {
     commentEl.innerHTML = comments
       .map(
         (c) => `
-      <div class="comment-item">
-        <div class="comment-meta">
-          <span>Course ID: ${c.course_id}</span>
-          <span>${new Date(c.feedback_date).toLocaleDateString()} &nbsp;|&nbsp; Rating: ${"★".repeat(c.rating)}${"☆".repeat(5 - c.rating)}</span>
+        <div class="comment-item">
+          <div class="comment-meta">
+            <span><strong>${escHtml(c.course_name)}</strong></span>
+            <span>${new Date(c.feedback_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })} &nbsp;|&nbsp; ${"★".repeat(c.rating)}${"☆".repeat(5 - c.rating)}</span>
+          </div>
+          <div class="comment-text">${escHtml(c.comment)}</div>
         </div>
-        <div class="comment-text">${escHtml(c.comment)}</div>
-      </div>
-    `,
+      `,
       )
       .join("");
   }

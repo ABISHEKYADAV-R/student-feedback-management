@@ -25,11 +25,12 @@ async function getFeedbackSummary(req, res) {
       [facultyId],
     );
 
-    // Get latest 5 comments per course
+    // Get latest 20 comments across all courses of this faculty
     const [comments] = await db.query(
       `
       SELECT
         f.course_id,
+        c.course_name,
         f.rating,
         f.comment,
         f.feedback_date
