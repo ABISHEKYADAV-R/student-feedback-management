@@ -49,9 +49,9 @@ async function loadSummary() {
   );
   const avgAll = summary.length
     ? (
-        summary.reduce((s, c) => s + Number(c.average_rating || 0), 0) /
-        summary.length
-      ).toFixed(2)
+      summary.reduce((s, c) => s + Number(c.average_rating || 0), 0) /
+      summary.length
+    ).toFixed(2)
     : "N/A";
 
   document.getElementById("summaryCards").innerHTML = `
@@ -84,24 +84,20 @@ async function loadSummary() {
     courseEl.innerHTML = summary
       .map(
         (c) => `
-        <div class="course-stat">
-          <div class="course-stat-name">${escHtml(c.course_name)}</div>
-          <div class="course-stat-info">
-            <div class="mini-stat">
-              <div class="val">${c.total_feedback || 0}</div>
-              <div class="lbl">Responses</div>
+        <div class="fb-row">
+          <div class="fb-row-title">${escHtml(c.course_name)}</div>
+          <div style="display: flex; gap: 32px;">
+            <div class="fb-row-stats">
+              <div style="font-size: 0.75rem; text-transform: uppercase;">Responses</div>
+              <div style="font-size: 1.1rem; font-weight: 600; color: var(--text);">${c.total_feedback || 0}</div>
             </div>
-            <div class="mini-stat">
-              <div class="val">${c.average_rating || "—"}</div>
-              <div class="lbl">Avg Rating</div>
+            <div class="fb-row-stats">
+              <div style="font-size: 0.75rem; text-transform: uppercase;">Range</div>
+              <div style="font-size: 1.1rem; font-weight: 600; color: var(--text);">${c.lowest_rating || "—"} - ${c.highest_rating || "—"}</div>
             </div>
-            <div class="mini-stat">
-              <div class="val">${c.lowest_rating || "—"}</div>
-              <div class="lbl">Lowest</div>
-            </div>
-            <div class="mini-stat">
-              <div class="val">${c.highest_rating || "—"}</div>
-              <div class="lbl">Highest</div>
+            <div class="fb-row-stats">
+              <div style="font-size: 0.75rem; text-transform: uppercase;">Average</div>
+              <div class="fb-row-rating" style="margin-top: -2px;">${c.average_rating ? Number(c.average_rating).toFixed(1) : "—"}</div>
             </div>
           </div>
         </div>
@@ -118,12 +114,13 @@ async function loadSummary() {
     commentEl.innerHTML = comments
       .map(
         (c) => `
-        <div class="comment-item">
-          <div class="comment-meta">
-            <span><strong>${escHtml(c.course_name)}</strong></span>
-            <span>${new Date(c.feedback_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })} &nbsp;|&nbsp; ${"★".repeat(c.rating)}${"☆".repeat(5 - c.rating)}</span>
+        <div class="review-card">
+          <div class="review-header">
+            <span class="review-course">${escHtml(c.course_name)}</span>
+            <span class="review-date">${new Date(c.feedback_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
           </div>
-          <div class="comment-text">${escHtml(c.comment)}</div>
+          <div class="review-stars">${"★".repeat(c.rating)}${"☆".repeat(5 - c.rating)}</div>
+          <div class="review-comment">${escHtml(c.comment)}</div>
         </div>
       `,
       )

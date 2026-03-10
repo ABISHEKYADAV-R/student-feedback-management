@@ -1,100 +1,117 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Student Feedback System</title>
-    <meta name="theme-color" content="#6366f1" />
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
-  <body class="auth-page">
-    <div class="auth-container">
-      <div class="auth-header">
-        <span class="logo-icon">&#127979;</span>
-        <h1>Smart Feedback System</h1>
-        <p>A modern platform for college student feedback and analytics.</p>
-      </div>
 
-      <!-- Role Selection Screen -->
-      <div id="roleSelection" class="role-cards">
-        <div class="role-card" onclick="selectRole('student')">
-          <span class="role-icon">&#127891;</span>
-          <h3>Student</h3>
-          <p>Submit feedback and suggestions</p>
-        </div>
-        
-        <div class="role-card" onclick="selectRole('faculty')">
-          <span class="role-icon">&#128104;&#8205;&#127979;</span>
-          <h3>Faculty</h3>
-          <p>View course feedback & ratings</p>
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Student Feedback System</title>
+  <meta name="theme-color" content="#6366f1" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
 
-        <div class="role-card" onclick="selectRole('admin')">
-          <span class="role-icon">&#128187;</span>
-          <h3>Admin</h3>
-          <p>System analytics & management</p>
-        </div>
-      </div>
-
-      <!-- Login Form Screen (Hidden by default) -->
-      <div id="loginSection" class="login-form-container">
-        <div class="login-form-header">
-          <button class="back-btn" onclick="showRoleSelection()">&#8592; Back</button>
-          <h2><span id="loginRoleIcon"></span> <span id="loginRoleTitle">Student Login</span></h2>
-        </div>
-
-        <form id="loginForm" class="auth-form">
-          <!-- Hidden input to store role -->
-          <input type="hidden" id="role" value="" />
-
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter your email"
-              autocomplete="email"
-              required />
-          </div>
-
-          <div class="form-group">
-            <label for="password">Password</label>
-            <div class="password-wrapper">
-              <input
-                type="password"
-                id="password"
-                placeholder="Enter your password"
-                autocomplete="current-password"
-                required />
-              <button
-                type="button"
-                class="toggle-pwd"
-                id="togglePwd"
-                title="Show/hide password">
-                &#128065;
-              </button>
-            </div>
-          </div>
-
-          <div id="loginError" class="alert alert-error hidden"></div>
-
-          <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
-            Sign In
-          </button>
-        </form>
-
-        <div class="auth-footer">
-          <p style="margin-bottom: 8px; font-weight: 700; color: var(--text);">
-            Demo Credentials
-          </p>
-          <div id="demoCredentialsList">
-            <!-- Will be populated by JS -->
-          </div>
-        </div>
-      </div>
-      
+<body class="auth-page">
+  <div class="auth-container">
+    <div class="auth-header">
+      <span class="logo-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </svg>
+      </span>
+      <h1>Smart Feedback System</h1>
+      <p>A modern platform for college student feedback and analytics.</p>
     </div>
 
-    <script src="js/auth.js"></script>
-  </body>
+    <!-- Role Selection Screen -->
+    <div id="roleSelection" class="role-cards">
+      <div class="role-card" onclick="selectRole('student')">
+        <span class="role-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </span>
+        <h3>Student</h3>
+        <p>Submit feedback and suggestions</p>
+      </div>
+
+      <div class="role-card" onclick="selectRole('faculty')">
+        <span class="role-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
+          </svg>
+        </span>
+        <h3>Faculty</h3>
+        <p>View course feedback & ratings</p>
+      </div>
+
+      <div class="role-card" onclick="selectRole('admin')">
+        <span class="role-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </span>
+        <h3>Admin</h3>
+        <p>System analytics & management</p>
+      </div>
+    </div>
+
+    <!-- Login Form Screen (Hidden by default) -->
+    <div id="loginSection" class="login-form-container">
+      <div class="login-form-header">
+        <button class="back-btn" onclick="showRoleSelection()">&#8592; Back</button>
+        <h2><span id="loginRoleIcon"></span> <span id="loginRoleTitle">Student Login</span></h2>
+      </div>
+
+      <form id="loginForm" class="auth-form">
+        <!-- Hidden input to store role -->
+        <input type="hidden" id="role" value="" />
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="Enter your email" autocomplete="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password"
+              required />
+            <button type="button" class="toggle-pwd" id="togglePwd" title="Show/hide password">
+              &#128065;
+            </button>
+          </div>
+        </div>
+
+        <div id="loginError" class="alert alert-error hidden"></div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+          Sign In
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p style="margin-bottom: 8px; font-weight: 700; color: var(--text);">
+          Demo Credentials
+        </p>
+        <div id="demoCredentialsList">
+          <!-- Will be populated by JS -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+
 </html>
