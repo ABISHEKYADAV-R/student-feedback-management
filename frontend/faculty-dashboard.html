@@ -7,6 +7,8 @@
   <title>Faculty Dashboard - Smart Feedback System</title>
   <meta name="theme-color" content="#4361ee" />
   <link rel="stylesheet" href="css/style.css" />
+  <script src="js/theme.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -21,6 +23,9 @@
       Smart Feedback System
     </div>
     <div class="nav-right">
+      <button class="btn btn-outline btn-sm theme-toggle" title="Toggle Theme" style="border-radius: 50%; padding: 4px 8px; font-size: 1.1rem;">
+        <span class="icon">☀️</span>
+      </button>
       <span class="nav-user" id="navUser"></span>
       <button class="btn btn-outline btn-sm" onclick="logout()">
         Logout
@@ -39,6 +44,12 @@
       <div class="stat-card loading-card">
         <span class="spinner"></span> Loading...
       </div>
+    </div>
+
+    <!-- Rating Distribution Chart -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 32px auto;">
+      <h3 style="text-align: center; justify-content: center; margin-bottom: 24px;">Rating Distribution</h3>
+      <canvas id="ratingChart" style="max-height: 300px;"></canvas>
     </div>
 
     <!-- Feedback per course -->

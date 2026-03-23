@@ -39,7 +39,7 @@ app.get("*", (req, res) => {
 });
 
 // ─── Start server (initialize DB first) ───────────────────────────────────────
-const PORT = process.env.PORT || 5002;
+const PORT = parseInt(process.env.PORT || "5002", 10);
 
 const initDb = require("./config/initDb");
 

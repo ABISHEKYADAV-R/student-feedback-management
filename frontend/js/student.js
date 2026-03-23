@@ -125,7 +125,7 @@ document
       return showInline(msgEl, "Please select a star rating.", "error");
 
     btn.disabled = true;
-    btn.textContent = "Submitting...";
+    btn.classList.add("btn-loading");
 
     const data = await api("POST", "/student/feedback", {
       course_id: parseInt(course_id),
@@ -134,7 +134,7 @@ document
     });
 
     btn.disabled = false;
-    btn.innerHTML = "&#128274; Submit Anonymously";
+    btn.classList.remove("btn-loading");
 
     if (data.success) {
       showToast(data.message, "success");
@@ -164,7 +164,7 @@ document
       return showInline(msgEl, "Please enter a suggestion.", "error");
 
     btn.disabled = true;
-    btn.textContent = "Submitting...";
+    btn.classList.add("btn-loading");
 
     const data = await api("POST", "/student/suggestion", {
       course_id: parseInt(course_id),
@@ -172,7 +172,7 @@ document
     });
 
     btn.disabled = false;
-    btn.innerHTML = "&#128274; Submit Anonymously";
+    btn.classList.remove("btn-loading");
 
     if (data.success) {
       showToast(data.message, "success");

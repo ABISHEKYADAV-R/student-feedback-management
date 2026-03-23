@@ -49,29 +49,44 @@ async function loadSummary() {
   );
   const avgAll = summary.length
     ? (
-      summary.reduce((s, c) => s + Number(c.average_rating || 0), 0) /
-      summary.length
-    ).toFixed(2)
+        summary.reduce((s, c) => s + Number(c.average_rating || 0), 0) /
+        summary.length
+      ).toFixed(2)
     : "N/A";
 
   document.getElementById("summaryCards").innerHTML = `
     <div class="stat-card">
-      <div class="stat-value">${totalFeedback}</div>
+      <div class="stat-value" style="display:flex; justify-content:space-between; align-items:flex-start;">
+        ${totalFeedback}
+        <span style="font-size:2rem; opacity:0.2;">📊</span>
+      </div>
       <div class="stat-label">Total Feedback</div>
     </div>
     <div class="stat-card green">
-      <div class="stat-value">${avgAll}</div>
+      <div class="stat-value" style="display:flex; justify-content:space-between; align-items:flex-start;">
+        ${avgAll}
+        <span style="font-size:2rem; opacity:0.2;">⭐</span>
+      </div>
       <div class="stat-label">Avg Rating</div>
     </div>
     <div class="stat-card orange">
-      <div class="stat-value">${summary.length}</div>
+      <div class="stat-value" style="display:flex; justify-content: space-between; align-items:flex-start;">
+        ${summary.length}
+        <span style="font-size:2rem; opacity:0.2;">📚</span>
+      </div>
       <div class="stat-label">Courses</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">${comments.length}</div>
+      <div class="stat-value" style="display:flex; justify-content: space-between; align-items:flex-start;">
+        ${comments.length}
+        <span style="font-size:2rem; opacity:0.2;">💬</span>
+      </div>
       <div class="stat-label">Comments</div>
     </div>
   `;
+
+  // ── Render Chart.js ──
+  renderChart(data.distribution || summary);
 
   // ── Per-course detail ──
   const courseEl = document.getElementById("courseCards");
@@ -84,20 +99,24 @@ async function loadSummary() {
     courseEl.innerHTML = summary
       .map(
         (c) => `
-        <div class="fb-row">
-          <div class="fb-row-title">${escHtml(c.course_name)}</div>
-          <div style="display: flex; gap: 32px;">
-            <div class="fb-row-stats">
-              <div style="font-size: 0.75rem; text-transform: uppercase;">Responses</div>
-              <div style="font-size: 1.1rem; font-weight: 600; color: var(--text);">${c.total_feedback || 0}</div>
+        <div class="course-stat">
+          <div class="course-stat-name">${escHtml(c.course_name)}</div>
+          <div class="course-stat-info">
+            <div class="mini-stat">
+              <div class="val">${c.total_feedback || 0}</div>
+              <div class="lbl">Responses</div>
             </div>
-            <div class="fb-row-stats">
-              <div style="font-size: 0.75rem; text-transform: uppercase;">Range</div>
-              <div style="font-size: 1.1rem; font-weight: 600; color: var(--text);">${c.lowest_rating || "—"} - ${c.highest_rating || "—"}</div>
+            <div class="mini-stat">
+              <div class="val">${c.average_rating || "—"}</div>
+              <div class="lbl">Avg Rating</div>
             </div>
-            <div class="fb-row-stats">
-              <div style="font-size: 0.75rem; text-transform: uppercase;">Average</div>
-              <div class="fb-row-rating" style="margin-top: -2px;">${c.average_rating ? Number(c.average_rating).toFixed(1) : "—"}</div>
+            <div class="mini-stat">
+              <div class="val">${c.lowest_rating || "—"}</div>
+              <div class="lbl">Lowest</div>
+            </div>
+            <div class="mini-stat">
+              <div class="val">${c.highest_rating || "—"}</div>
+              <div class="lbl">Highest</div>
             </div>
           </div>
         </div>
@@ -114,13 +133,12 @@ async function loadSummary() {
     commentEl.innerHTML = comments
       .map(
         (c) => `
-        <div class="review-card">
-          <div class="review-header">
-            <span class="review-course">${escHtml(c.course_name)}</span>
-            <span class="review-date">${new Date(c.feedback_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+        <div class="comment-item">
+          <div class="comment-meta">
+            <span><strong>${escHtml(c.course_name)}</strong></span>
+            <span>${new Date(c.feedback_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })} &nbsp;|&nbsp; ${"★".repeat(c.rating)}${"☆".repeat(5 - c.rating)}</span>
           </div>
-          <div class="review-stars">${"★".repeat(c.rating)}${"☆".repeat(5 - c.rating)}</div>
-          <div class="review-comment">${escHtml(c.comment)}</div>
+          <div class="comment-text">${escHtml(c.comment)}</div>
         </div>
       `,
       )
@@ -135,6 +153,62 @@ function escHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+let ratingChartInstance = null;
+function renderChart(summaryData) {
+  const ctx = document.getElementById('ratingChart');
+  if(!ctx) return;
+  
+  // Calculate distribution (mocking from summary averages if real distribution isn't available)
+  let distribution = [0, 0, 0, 0, 0];
+  
+  if (Array.isArray(summaryData)) {
+    summaryData.forEach(c => {
+      // Basic grouping based on average rating if detailed distribution isn't provided by backend
+      const avg = Math.round(Number(c.average_rating || 0));
+      if(avg > 0 && avg <= 5) distribution[avg - 1] += Number(c.total_feedback || 0);
+    });
+  }
+  
+  if (ratingChartInstance) ratingChartInstance.destroy();
+
+  ratingChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+      datasets: [{
+        label: 'Feedback Count',
+        data: distribution,
+        backgroundColor: [
+          '#ef4444', // 1 star red
+          '#f97316', // 2 star orange
+          '#eab308', // 3 star yellow
+          '#84cc16', // 4 star lime
+          '#22c55e'  // 5 star green
+        ],
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { 
+          beginAtZero: true,
+          ticks: { stepSize: 1, color: "var(--text-muted)" },
+          grid: { color: "var(--border)" }
+        },
+        x: {
+          ticks: { color: "var(--text-muted)" },
+          grid: { display: false }
+        }
+      }
+    }
+  });
 }
 
 // ─── Init ─────────────────────────────────────────────────────

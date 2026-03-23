@@ -163,7 +163,7 @@ async function loadActions(status = "") {
               <td>${escHtml(a.course_name)}</td>
               <td>${escHtml(a.issue_description)}</td>
               <td>${escHtml(a.action_taken)}</td>
-              <td><span class="badge badge-${a.status}">${a.status}</span></td>
+              <td><span class="badge ${getBadgeClass(a.status)}" style="text-transform: capitalize;">${a.status}</span></td>
               <td>
                 <select onchange="updateStatus(${a.action_id}, this.value)" style="padding:4px 8px;border:1px solid #dee2e6;border-radius:6px;font-size:.8rem;">
                   <option value="pending"     ${a.status === "pending" ? "selected" : ""}>Pending</option>
@@ -301,6 +301,12 @@ function showMsg(el, msg, type) {
   el.textContent = msg;
   el.className = `alert alert-${type === "error" ? "error" : "success"}`;
   setTimeout(() => el.classList.add("hidden"), 5000);
+}
+
+function getBadgeClass(status) {
+  if (status === 'resolved') return 'badge-green';
+  if (status === 'in-progress') return 'badge-yellow';
+  return 'badge-red';
 }
 
 function escHtml(str) {

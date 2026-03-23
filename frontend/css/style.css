@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 /* ============================================================
    Smart Student Feedback System - Professional Enterprise Stylesheet
@@ -14,9 +14,15 @@
 }
 
 :root {
-  --primary: #2563eb;
-  /* Professional Blue */
-  --primary-hover: #1d4ed8;
+  /* Light Theme (Default) */
+  --bg-color: #ffffff;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --card-bg: #f9fafb;
+  --card-border: #e5e7eb;
+  
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
   --primary-light: #eff6ff;
 
   --success: #10b981;
@@ -28,35 +34,53 @@
   --info: #3b82f6;
   --info-light: #dbeafe;
 
-  --bg-color: #f8fafc;
-  /* Slate 50 */
-  --card-bg: #ffffff;
-  --card-border: #e2e8f0;
+  --border: #e5e7eb;
 
-  --text: #0f172a;
-  /* Slate 900 */
-  --text-muted: #64748b;
-  /* Slate 500 */
-  --border: #e2e8f0;
-
-  --radius: 8px;
-  /* Professional slight rounding */
-  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-sm: 8px;
 
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 
-  --transition: 0.2s ease-in-out;
+  --transition: 0.3s ease;
+}
+
+html.dark-theme {
+  --bg-color: #111827;
+  --text: #f3f4f6;
+  --text-muted: #9ca3af;
+  --card-bg: #1f2937;
+  --card-border: #374151;
+  
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-light: #312e81;
+
+  --border: #374151;
+  
+  /* Dark mode specific subtle adjustments */
+  --success-light: #064e3b;
+  --warning-light: #78350f;
+  --danger-light: #7f1d1d;
+  --info-light: #1e3a8a;
+  
+  color-scheme: dark;
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
   background-color: var(--bg-color);
   color: var(--text);
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+/* Ensure smooth transitions on major elements */
+.card, .btn, .navbar, input, select, textarea, .stat-card, .table th, .table td {
+  transition: all var(--transition);
 }
 
 /* ─── Navbar ────────────────────────────────────────────────── */
@@ -272,7 +296,7 @@ body {
   width: 100%;
   padding: 10px 14px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--bg-color);
   border-radius: var(--radius-sm);
   font-size: 0.95rem;
   color: var(--text);
@@ -718,7 +742,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 16px;
-  background: #fff;
+  background: var(--card-bg);
   transition: var(--transition);
 }
 
@@ -763,7 +787,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 12px;
-  background: #fff;
+  background: var(--card-bg);
 }
 
 .fb-row-title {
@@ -877,4 +901,48 @@ body {
   .stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ─── UI Enhancements ────────────────────────────────────────── */
+.form-center-card {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.btn.btn-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+.btn.btn-loading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  transform: translate(-50%, -50%);
+  animation: btn-spin 0.8s linear infinite;
+}
+@keyframes btn-spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--text-muted);
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spinner-spin 0.8s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+@keyframes spinner-spin {
+  to { transform: rotate(360deg); }
 }

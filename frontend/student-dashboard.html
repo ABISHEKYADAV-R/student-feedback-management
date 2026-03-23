@@ -7,6 +7,7 @@
   <title>Student Dashboard - Smart Feedback System</title>
   <meta name="theme-color" content="#4361ee" />
   <link rel="stylesheet" href="css/style.css" />
+  <script src="js/theme.js"></script>
 </head>
 
 <body>
@@ -21,6 +22,9 @@
       Smart Feedback System
     </div>
     <div class="nav-right">
+      <button class="btn btn-outline btn-sm theme-toggle" title="Toggle Theme" style="border-radius: 50%; padding: 4px 8px; font-size: 1.1rem;">
+        <span class="icon">☀️</span>
+      </button>
       <span class="nav-user" id="navUser"></span>
       <button class="btn btn-outline btn-sm" onclick="logout()">
         Logout
@@ -52,10 +56,10 @@
 
     <!-- ── Tab: Submit Feedback ── -->
     <div class="tab-content active" id="tab-feedback">
-      <div class="card">
-        <h3>Submit Anonymous Feedback</h3>
-        <p class="text-muted">
-          Your identity will not be stored. Be honest and constructive.
+      <div class="card form-center-card">
+        <h3 style="text-align: center;">Submit Anonymous Feedback</h3>
+        <p class="text-muted" style="text-align: center; margin-bottom: 24px;">
+          👉 <strong style="color: var(--primary);">Your feedback is anonymous.</strong> Your identity will not be stored.
         </p>
 
         <form id="feedbackForm">
@@ -96,9 +100,11 @@
 
     <!-- ── Tab: Submit Suggestion ── -->
     <div class="tab-content" id="tab-suggestion">
-      <div class="card">
-        <h3>Submit Anonymous Suggestion</h3>
-        <p class="text-muted">Help improve courses by sharing your ideas.</p>
+      <div class="card form-center-card">
+        <h3 style="text-align: center;">Submit Anonymous Suggestion</h3>
+        <p class="text-muted" style="text-align: center; margin-bottom: 24px;">
+          👉 <strong style="color: var(--primary);">Your suggestion is anonymous.</strong> Help improve courses by sharing your ideas.
+        </p>
 
         <form id="suggestionForm">
           <div class="form-group">

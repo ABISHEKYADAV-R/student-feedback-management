@@ -1,20 +1,53 @@
-// config/db.js - MySQL connection pool using mysql2
-const mysql = require("mysql2");
+// config/db.js - SQLite connection wrapper for mysql2 compatibility
+const sqlite3 = require("sqlite3");
+const { open } = require("sqlite");
 const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+const fs = require("fs");
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  port: process.env.DB_PORT || 3306,
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "student_feedback_db",
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
+const dbPath = path.join(__dirname, "..", "database.sqlite");
+
+// Initialize SQLite promise
+let dbPromise = open({
+  filename: dbPath,
+  driver: sqlite3.Database
 });
 
-// Promisify for async/await support
-const db = pool.promise();
+// Enable foreign keys
+dbPromise.then(db => db.run("PRAGMA foreign_keys = ON"));
 
-module.exports = db;
+// Create a wrapper object matching the expected `db.execute(sql, params)` interface
+const dbWrapper = {
+  execute: async (sql, params = []) => {
+    // MySQL query params with ? work identically to SQLite
+    const db = await dbPromise;
+
+    if (sql.trim().toUpperCase().startsWith("SELECT") || sql.trim().toUpperCase().startsWith("SHOW")) {
+      const rows = await db.all(sql, params);
+      return [rows]; // mimicking mysql2 [rows, fields] array
+    } else {
+      const result = await db.run(sql, params);
+      // mimicking mysql2 [result] object containing insertId
+      return [{ insertId: result.lastID, affectedRows: result.changes }];
+    }
+  },
+  query: async function(sql, params = []) {
+    return this.execute(sql, params);
+  }
+};
+
+// Initialize schema on first run if needed
+dbPromise.then(async (db) => {
+  try {
+    const tableExists = await db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='users'");
+    if (!tableExists) {
+      console.log("Initializing SQLite database from schema.sql...");
+      const schemaSql = fs.readFileSync(path.join(__dirname, "..", "..", "database", "schema.sql"), "utf8");
+      await db.exec(schemaSql);
+      console.log("Database initialized successfully!");
+    }
+  } catch (err) {
+    console.error("Database initialization failed:", err);
+  }
+});
+
+module.exports = dbWrapper;

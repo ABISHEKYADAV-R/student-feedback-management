@@ -73,7 +73,7 @@ document
 
     errEl.classList.add("hidden");
     btn.disabled = true;
-    btn.textContent = "Signing in...";
+    btn.classList.add("btn-loading");
 
     try {
       const res = await fetch(`${API}/login`, {
@@ -103,7 +103,7 @@ document
       showError(errEl, "Could not connect to server. Is the backend running?");
     } finally {
       btn.disabled = false;
-      btn.textContent = "Sign In";
+      btn.classList.remove("btn-loading");
     }
   });
 
