@@ -5,9 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard - Smart Feedback System</title>
-  <meta name="theme-color" content="#4361ee" />
+  <meta name="description" content="Admin dashboard for managing student feedback, courses, and system analytics." />
+  <meta name="theme-color" content="#6366f1" />
   <link rel="stylesheet" href="css/style.css" />
   <script src="js/theme.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -22,22 +24,34 @@
       Smart Feedback System
     </div>
     <div class="nav-right">
-      <button class="btn btn-outline btn-sm theme-toggle" title="Toggle Theme" style="border-radius: 50%; padding: 4px 8px; font-size: 1.1rem;">
+      <button class="btn btn-outline btn-sm theme-toggle" title="Toggle Theme"
+        style="border-radius: 50%; padding: 4px 8px; font-size: 1.1rem;">
         <span class="icon">☀️</span>
       </button>
       <span class="nav-user" id="navUser"></span>
+      <span class="nav-role-badge">Admin</span>
       <button class="btn btn-outline btn-sm" onclick="logout()">
         Logout
       </button>
     </div>
   </nav>
 
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <div class="container">
-    <div class="page-header">
-      <h2>Admin Dashboard</h2>
-      <p>
-        Manage the feedback system, review statistics, and record actions.
-      </p>
+    <!-- Welcome Banner -->
+    <div class="welcome-banner animate-in">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+        stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+        <line x1="8" y1="21" x2="16" y2="21"></line>
+        <line x1="12" y1="17" x2="12" y2="21"></line>
+      </svg>
+      <div>
+        <h2 id="welcomeTitle">Admin Dashboard</h2>
+        <p>Manage the feedback system, review statistics, and record actions.</p>
+      </div>
     </div>
 
     <!-- Overview Stats -->
@@ -47,44 +61,108 @@
       </div>
     </div>
 
-    <!-- Rating Breakdown -->
-    <div class="card">
-      <h3>Rating Breakdown</h3>
-      <div id="ratingBars">
-        <p class="loading"><span class="spinner"></span> Loading...</p>
+    <!-- Rating Breakdown + Chart Grid -->
+    <div class="dashboard-grid-2">
+      <div class="card animate-in">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          Rating Breakdown
+        </h3>
+        <div id="ratingBars">
+          <p class="loading"><span class="spinner"></span> Loading...</p>
+        </div>
+      </div>
+      <div class="card animate-in">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          Rating Distribution
+        </h3>
+        <canvas id="ratingChart" style="max-height: 260px;"></canvas>
       </div>
     </div>
 
     <!-- Tab Navigation -->
     <div class="tabs">
       <button class="tab-btn active" data-tab="courses">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </svg>
         Courses
       </button>
-      <button class="tab-btn" data-tab="actions">Actions</button>
+      <button class="tab-btn" data-tab="actions">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;">
+          <polyline points="9 11 12 14 22 4"></polyline>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        Actions
+      </button>
       <button class="tab-btn" data-tab="suggestions">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
         Suggestions
       </button>
-      <button class="tab-btn" data-tab="addCourse">&#43; Add Course</button>
+      <button class="tab-btn" data-tab="addCourse">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add Course
+      </button>
       <button class="tab-btn" data-tab="recordAction">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="12" y1="18" x2="12" y2="12"></line>
+          <line x1="9" y1="15" x2="15" y2="15"></line>
+        </svg>
         Record Action
       </button>
     </div>
 
     <!-- ── Tab: Courses ── -->
     <div class="tab-content active" id="tab-courses">
-      <div class="card">
-        <h3>All Courses</h3>
+      <div class="card animate-in">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+          </svg>
+          All Courses
+        </h3>
         <div id="courseTable">
-          <p class="loading">Loading...</p>
+          <p class="loading"><span class="spinner"></span> Loading...</p>
         </div>
       </div>
     </div>
 
     <!-- ── Tab: Actions ── -->
     <div class="tab-content" id="tab-actions">
-      <div class="card">
+      <div class="card animate-in">
         <div class="card-header-row">
-          <h3>Actions Recorded</h3>
+          <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            Actions Recorded
+          </h3>
           <div class="filter-row">
             <label>Filter by status:</label>
             <select id="actionStatusFilter" onchange="filterActions(this.value)">
@@ -96,25 +174,38 @@
           </div>
         </div>
         <div id="actionsList">
-          <p class="loading">Loading...</p>
+          <p class="loading"><span class="spinner"></span> Loading...</p>
         </div>
       </div>
     </div>
 
     <!-- ── Tab: Suggestions ── -->
     <div class="tab-content" id="tab-suggestions">
-      <div class="card">
-        <h3>Student Suggestions</h3>
+      <div class="card animate-in">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          Student Suggestions
+        </h3>
         <div id="suggestionsList">
-          <p class="loading">Loading...</p>
+          <p class="loading"><span class="spinner"></span> Loading...</p>
         </div>
       </div>
     </div>
 
     <!-- ── Tab: Add Course ── -->
     <div class="tab-content" id="tab-addCourse">
-      <div class="card">
-        <h3>Add New Course</h3>
+      <div class="card form-center-card animate-in">
+        <h3 style="text-align: center; justify-content: center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add New Course
+        </h3>
         <form id="addCourseForm">
           <div class="form-group">
             <label for="ac_name">Course Name</label>
@@ -127,15 +218,24 @@
             </select>
           </div>
           <div id="acMsg" class="alert hidden"></div>
-          <button type="submit" class="btn btn-primary">Add Course</button>
+          <button type="submit" class="btn btn-primary btn-block">Add Course</button>
         </form>
       </div>
     </div>
 
     <!-- ── Tab: Record Action ── -->
     <div class="tab-content" id="tab-recordAction">
-      <div class="card">
-        <h3>Record Action on Feedback Issue</h3>
+      <div class="card form-center-card animate-in">
+        <h3 style="text-align: center; justify-content: center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+          Record Action on Feedback Issue
+        </h3>
         <form id="recordActionForm">
           <div class="form-group">
             <label for="ra_course">Select Course</label>
@@ -160,12 +260,11 @@
             </select>
           </div>
           <div id="raMsg" class="alert hidden"></div>
-          <button type="submit" class="btn btn-primary">Record Action</button>
+          <button type="submit" class="btn btn-primary btn-block">Record Action</button>
         </form>
       </div>
     </div>
   </div>
-
 
   <script src="js/admin.js"></script>
 </body>
