@@ -57,11 +57,11 @@ CREATE TABLE IF NOT EXISTS suggestions (
 
 -- Default admin (password: admin123)
 INSERT INTO users (name, email, password, role) VALUES
-('Admin User',    'admin@college.com',   '$2a$10$Oe5lfjLg5TxUmrS982mseun85KQ7acMIh/KhsgIY5MMB0HIGbbLCS', 'admin'),
-('Dr. Smith',     'smith@college.com',   '$2a$10$kgdlXj4U.6yWMCRQ6DAE5.BA8mXgHdjG/5.wq1wwP9u/o8zIKQs/S', 'faculty'),
-('Dr. Johnson',   'johnson@college.com', '$2a$10$kgdlXj4U.6yWMCRQ6DAE5.BA8mXgHdjG/5.wq1wwP9u/o8zIKQs/S', 'faculty'),
-('Ramu Student', 'ram@student.com',   '$2a$10$viqbx1E33C3y9arYORODsep0G0Koy83ipVWstNiCghr8y0aMJmNJu', 'student'),
-('Bob Student',   'bob@student.com',     '$2a$10$viqbx1E33C3y9arYORODsep0G0Koy83ipVWstNiCghr8y0aMJmNJu', 'student');
+('Admin User',    'admin@college.com',   '$2a$10$p/2XygImQpSCuDMcOoL8p.edARMXOm.4EmyRmgjJC1c22UImSXqK2', 'admin'),
+('Dr. Smith',     'smith@college.com',   '$2a$10$oYlnjJnGVP1LosjEZ90upuxkFpsHUznK5K.A9uSnPelEJlIeTjGHm', 'faculty'),
+('Dr. Johnson',   'johnson@college.com', '$2a$10$oYlnjJnGVP1LosjEZ90upuxkFpsHUznK5K.A9uSnPelEJlIeTjGHm', 'faculty'),
+('Ramu Student',  'ram@student.com',     '$2a$10$TmxBZNyU/SUVJLqgKhRmg.5XgfN6tfQoW7ze6kZjZCK7ykdzEaKsS', 'student'),
+('Bob Student',   'bob@student.com',     '$2a$10$TmxBZNyU/SUVJLqgKhRmg.5XgfN6tfQoW7ze6kZjZCK7ykdzEaKsS', 'student');
 
 INSERT INTO courses (course_name, faculty_id) VALUES
 ('Mathematics 101',   2),

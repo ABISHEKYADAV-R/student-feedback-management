@@ -85,7 +85,7 @@ body {
 
 /* ─── Navbar ────────────────────────────────────────────────── */
 .navbar {
-  background: #ffffff;
+  background: var(--bg-color);
   color: var(--text);
   padding: 0 32px;
   height: 64px;
@@ -433,7 +433,7 @@ body {
 }
 
 .toast {
-  background: #ffffff;
+  background: var(--card-bg);
   color: var(--text);
   padding: 14px 18px;
   border-radius: var(--radius);
@@ -814,7 +814,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 16px;
-  background: #fff;
+  background: var(--card-bg);
   border-left: 4px solid var(--info);
 }
 
