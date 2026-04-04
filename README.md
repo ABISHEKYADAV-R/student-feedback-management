@@ -1,23 +1,59 @@
-# Smart Student Feedback System
+# 📚 Smart Student Feedback System
 
-A full-stack web application for anonymous student feedback, built with **Node.js + Express + MySQL + HTML/CSS/JS**.
+A full-stack web application for **anonymous student feedback** with role-based dashboards, feedback analytics, and trend tracking — built with **Node.js + Express + MySQL + Vanilla JS**.
+
+![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-4.x-000000?logo=express&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.x-4479A1?logo=mysql&logoColor=white)
+![JWT](https://img.shields.io/badge/Auth-JWT-orange?logo=jsonwebtokens&logoColor=white)
+![Chart.js](https://img.shields.io/badge/Charts-Chart.js-FF6384?logo=chartdotjs&logoColor=white)
 
 ---
 
-## Project Structure
+## ✨ Key Features
+
+### 🎓 Student Dashboard
+- Submit **anonymous** feedback (rating 1–5 + comment) per course
+- Choose a **feedback category** (Teaching Quality, Course Material, Lab Work, Exam Difficulty, Communication, Other)
+- **Duplicate prevention** — only one feedback per student per course is allowed
+- Submit **anonymous** suggestions
+- View improvements/actions taken by admin
+
+### 👨‍🏫 Faculty Dashboard
+- View feedback summary (avg rating, count, lowest/highest) for own courses
+- **Rating distribution chart** (doughnut chart via Chart.js)
+- **Feedback trends over time** (line chart — avg rating + count by week)
+- **Category breakdown** — see which areas students are commenting on most
+- **Quick summary** — auto-generated text overview of feedback stats
+- Read recent student comments with ratings
+
+### 🛠️ Admin Dashboard
+- View overall statistics (total feedback, avg rating, suggestions, pending actions)
+- **Rating breakdown** bar chart + **doughnut distribution** chart
+- **Feedback trends over time** (weekly line chart with dual axes)
+- **Category stats** — feedback counts and avg ratings per category
+- Manage courses (view / add)
+- Record actions taken on feedback issues
+- Update action status (pending → in-progress → resolved)
+- View all student suggestions
+
+---
+
+## 📁 Project Structure
 
 ```
 student-feedback-system/
 ├── database/
-│   └── schema.sql              ← Run this in MySQL first
+│   └── schema.sql              ← MySQL schema + seed data
 ├── backend/
 │   ├── config/
-│   │   └── db.js               ← MySQL connection pool
+│   │   ├── db.js               ← MySQL connection pool
+│   │   └── initDb.js           ← Database initialization check
 │   ├── controllers/
 │   │   ├── authController.js   ← Login / Register
-│   │   ├── studentController.js← Student features
-│   │   ├── facultyController.js← Faculty features
-│   │   └── adminController.js  ← Admin features
+│   │   ├── studentController.js← Student features + dedup
+│   │   ├── facultyController.js← Faculty features + trends
+│   │   └── adminController.js  ← Admin features + analytics
 │   ├── routes/
 │   │   ├── auth.js
 │   │   ├── student.js
@@ -31,14 +67,15 @@ student-feedback-system/
 │   ├── package.json
 │   └── .env.example            ← Copy to .env and configure
 └── frontend/
-    ├── index.html              ← Login page
+    ├── index.html              ← Login page (role selection)
     ├── student-dashboard.html
     ├── faculty-dashboard.html
     ├── admin-dashboard.html
     ├── css/
-    │   └── style.css
+    │   └── style.css           ← Full design system (dark/light)
     └── js/
         ├── auth.js
+        ├── theme.js            ← Dark/light mode toggle
         ├── student.js
         ├── faculty.js
         └── admin.js
@@ -46,7 +83,7 @@ student-feedback-system/
 
 ---
 
-## Setup Instructions
+## 🚀 Setup Instructions
 
 ### 1. Database Setup
 
@@ -67,13 +104,14 @@ npm install
 
 Copy `.env.example` to `.env` and fill in your MySQL details:
 
-```
+```env
 DB_HOST=localhost
+DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=student_feedback_db
 JWT_SECRET=your_secret_key
-PORT=5000
+PORT=5002
 ```
 
 ### 3. Seed Default Users
@@ -93,11 +131,11 @@ npm start
 npm run dev
 ```
 
-The app runs at **http://localhost:5000**
+The app runs at **http://localhost:5002**
 
 ---
 
-## Default Login Credentials
+## 🔐 Default Login Credentials
 
 | Role    | Email               | Password   |
 | ------- | ------------------- | ---------- |
@@ -109,57 +147,88 @@ The app runs at **http://localhost:5000**
 
 ---
 
-## API Endpoints
+## 📡 API Endpoints
 
-| Method | Endpoint                  | Role    | Description                     |
-| ------ | ------------------------- | ------- | ------------------------------- |
-| POST   | /login                    | All     | Login and get JWT token         |
-| POST   | /register                 | All     | Register new user               |
-| GET    | /student/courses          | Student | Get all courses                 |
-| POST   | /student/feedback         | Student | Submit anonymous feedback       |
-| POST   | /student/suggestion       | Student | Submit anonymous suggestion     |
-| GET    | /student/improvements     | Student | View resolved improvements      |
-| GET    | /faculty/feedback-summary | Faculty | Feedback summary for my courses |
-| GET    | /faculty/courses          | Faculty | My assigned courses             |
-| GET    | /admin/feedback-stats     | Admin   | Overall statistics              |
-| GET    | /admin/actions            | Admin   | List recorded actions           |
-| POST   | /admin/action             | Admin   | Record a new action             |
-| PUT    | /admin/action/:id         | Admin   | Update action status            |
-| GET    | /admin/courses            | Admin   | List all courses                |
-| POST   | /admin/course             | Admin   | Add a new course                |
-| GET    | /admin/faculty            | Admin   | List all faculty members        |
-| GET    | /admin/suggestions        | Admin   | View all suggestions            |
+### Authentication
 
----
+| Method | Endpoint    | Description           |
+| ------ | ----------- | --------------------- |
+| POST   | `/login`    | Login and get JWT     |
+| POST   | `/register` | Register new user     |
 
-## Features
+### Student Routes (requires JWT + student role)
 
-### Student
+| Method | Endpoint                | Description                        |
+| ------ | ----------------------- | ---------------------------------- |
+| GET    | `/student/courses`      | List all courses                   |
+| GET    | `/student/categories`   | List valid feedback categories     |
+| POST   | `/student/feedback`     | Submit anonymous feedback (1/course) |
+| POST   | `/student/suggestion`   | Submit anonymous suggestion        |
+| GET    | `/student/improvements` | View resolved improvements         |
 
-- Submit **anonymous** feedback (rating 1–5 + comment) per course
-- Submit **anonymous** suggestions
-- View improvements/actions taken by admin
+### Faculty Routes (requires JWT + faculty role)
 
-### Faculty
+| Method | Endpoint                    | Description                          |
+| ------ | --------------------------- | ------------------------------------ |
+| GET    | `/faculty/feedback-summary` | Feedback stats + comments + charts   |
+| GET    | `/faculty/courses`          | Courses assigned to this faculty     |
+| GET    | `/faculty/feedback-trends`  | Weekly feedback trends (line chart)  |
+| GET    | `/faculty/quick-summary`    | Auto-generated text summary          |
 
-- View feedback summary (avg rating, count) for own courses
-- Read recent student comments
+### Admin Routes (requires JWT + admin role)
 
-### Admin
-
-- View overall statistics (total feedback, avg rating, suggestions, pending actions)
-- Rating breakdown bar chart
-- Manage courses (view / add)
-- Record actions taken on feedback issues
-- Update action status (pending → in-progress → resolved)
-- View all student suggestions
+| Method | Endpoint                   | Description                         |
+| ------ | -------------------------- | ----------------------------------- |
+| GET    | `/admin/feedback-stats`    | Overall stats + category breakdown  |
+| GET    | `/admin/feedback-trends`   | Weekly feedback trends (line chart) |
+| GET    | `/admin/actions`           | List recorded actions               |
+| POST   | `/admin/action`            | Record a new action                 |
+| PUT    | `/admin/action/:id`        | Update action status                |
+| GET    | `/admin/courses`           | List all courses                    |
+| POST   | `/admin/course`            | Add a new course                    |
+| GET    | `/admin/faculty`           | List all faculty members            |
+| GET    | `/admin/suggestions`       | View all suggestions                |
 
 ---
 
-## Technologies Used
+## 🗄️ Database Schema
 
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript
-- **Backend:** Node.js, Express.js
-- **Database:** MySQL (mysql2 driver)
-- **Auth:** JWT (jsonwebtoken) + bcryptjs password hashing
-- **Other:** dotenv, cors
+| Table                | Purpose                                               |
+| -------------------- | ----------------------------------------------------- |
+| `users`              | All users (students, faculty, admin) with hashed passwords |
+| `courses`            | Courses linked to faculty members                     |
+| `feedback`           | Anonymous feedback with rating, comment, and category |
+| `feedback_tracking`  | Prevents duplicate submissions (student_id + course_id unique) |
+| `suggestions`        | Anonymous student suggestions                         |
+| `actions`            | Admin actions taken on feedback issues                |
+
+---
+
+## 🛡️ Security
+
+- **JWT Authentication** — All dashboard routes are protected with Bearer tokens
+- **Role-based access control** — Middleware enforces student/faculty/admin permissions
+- **Password hashing** — bcryptjs with salt rounds
+- **Anonymous feedback** — Student identity is NOT stored in the feedback table
+- **Duplicate prevention** — Tracked separately so anonymity is preserved
+- **XSS protection** — All dynamic content is HTML-escaped before rendering
+
+---
+
+## 🛠️ Technologies Used
+
+| Layer      | Tech                                    |
+| ---------- | --------------------------------------- |
+| Frontend   | HTML5, CSS3, Vanilla JavaScript         |
+| Backend    | Node.js, Express.js                     |
+| Database   | MySQL (mysql2 driver)                   |
+| Auth       | JWT (jsonwebtoken) + bcryptjs           |
+| Charts     | Chart.js (doughnut + line charts)       |
+| Styling    | Custom CSS with dark/light mode support |
+| Other      | dotenv, cors, nodemon (dev)             |
+
+---
+
+## 📄 License
+
+This project is built for educational purposes as a college project.
