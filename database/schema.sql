@@ -26,8 +26,20 @@ CREATE TABLE IF NOT EXISTS feedback (
     course_id     INTEGER NOT NULL,
     rating        INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
     comment       TEXT,
+    category      VARCHAR(50) DEFAULT NULL,
     feedback_date DATE NOT NULL DEFAULT CURRENT_DATE,
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
+);
+
+-- Feedback tracking table (prevents duplicate submissions per student per course)
+CREATE TABLE IF NOT EXISTS feedback_tracking (
+    tracking_id   INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id    INTEGER NOT NULL,
+    course_id     INTEGER NOT NULL,
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(student_id, course_id),
+    FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 

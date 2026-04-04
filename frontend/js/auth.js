@@ -28,7 +28,7 @@ function selectRole(role) {
   if (role === 'student') {
     loginRoleTitle.textContent = "Student Login";
     loginRoleIcon.innerHTML = "&#127891;";
-    demoCredentialsList.innerHTML = `<span class="cred-item">ram@student.com / student123</span>`;
+    demoCredentialsList.innerHTML = `<span class="cred-item">alice@student.com / student123</span>`;
   } else if (role === 'faculty') {
     loginRoleTitle.textContent = "Faculty Login";
     loginRoleIcon.innerHTML = "&#128104;&#8205;&#127979;";
@@ -73,7 +73,7 @@ document
 
     errEl.classList.add("hidden");
     btn.disabled = true;
-    btn.classList.add("btn-loading");
+    btn.textContent = "Signing in...";
 
     try {
       const res = await fetch(`${API}/login`, {
@@ -103,7 +103,7 @@ document
       showError(errEl, "Could not connect to server. Is the backend running?");
     } finally {
       btn.disabled = false;
-      btn.classList.remove("btn-loading");
+      btn.textContent = "Sign In";
     }
   });
 

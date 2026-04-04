@@ -4,6 +4,7 @@ const router = express.Router();
 const { verifyToken, requireRole } = require("../middleware/authMiddleware");
 const {
   getFeedbackStats,
+  getFeedbackTrends,
   recordAction,
   getActions,
   updateActionStatus,
@@ -17,6 +18,9 @@ router.use(verifyToken, requireRole("admin"));
 
 // GET  /admin/feedback-stats  - Overall feedback statistics
 router.get("/feedback-stats", getFeedbackStats);
+
+// GET  /admin/feedback-trends - Feedback trends over time
+router.get("/feedback-trends", getFeedbackTrends);
 
 // GET  /admin/actions         - List all actions (optional ?status= filter)
 router.get("/actions", getActions);

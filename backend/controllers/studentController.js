@@ -1,10 +1,21 @@
 // controllers/studentController.js - Student feature logic
 const db = require("../config/db");
 
+// Valid feedback categories
+const VALID_CATEGORIES = [
+  "Teaching Quality",
+  "Course Material",
+  "Lab Work",
+  "Exam Difficulty",
+  "Communication",
+  "Other",
+];
+
 // POST /student/feedback - Submit anonymous feedback for a course
 async function submitFeedback(req, res) {
   try {
-    const { course_id, rating, comment } = req.body;
+    const { course_id, rating, comment, category } = req.body;
+    const student_id = req.user.user_id;
 
     if (!course_id || !rating) {
       return res
@@ -21,6 +32,13 @@ async function submitFeedback(req, res) {
         .json({ success: false, message: "Rating must be between 1 and 5." });
     }
 
+    // Validate category if provided
+    if (category && !VALID_CATEGORIES.includes(category)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid feedback category." });
+    }
+
     // Verify course exists
     const [courses] = await db.query(
       "SELECT course_id FROM courses WHERE course_id = ?",
@@ -32,11 +50,32 @@ async function submitFeedback(req, res) {
         .json({ success: false, message: "Course not found." });
     }
 
+    // ── Duplicate prevention: check if student already submitted for this course ──
+    const [existing] = await db.query(
+      "SELECT tracking_id FROM feedback_tracking WHERE student_id = ? AND course_id = ?",
+      [student_id, course_id],
+    );
+    if (existing.length > 0) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+          message: "You have already submitted feedback for this course. Only one submission per course is allowed.",
+        });
+    }
+
     const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
+    // Insert the anonymous feedback (no student_id stored in feedback table)
     await db.query(
-      "INSERT INTO feedback (course_id, rating, comment, feedback_date) VALUES (?, ?, ?, ?)",
-      [course_id, rating, comment || null, today],
+      "INSERT INTO feedback (course_id, rating, comment, category, feedback_date) VALUES (?, ?, ?, ?, ?)",
+      [course_id, rating, comment || null, category || null, today],
+    );
+
+    // Track that this student submitted for this course (for dedup only)
+    await db.query(
+      "INSERT INTO feedback_tracking (student_id, course_id) VALUES (?, ?)",
+      [student_id, course_id],
     );
 
     return res
@@ -132,9 +171,15 @@ async function getCourses(req, res) {
   }
 }
 
+// GET /student/categories - List valid feedback categories
+async function getCategories(req, res) {
+  return res.json({ success: true, categories: VALID_CATEGORIES });
+}
+
 module.exports = {
   submitFeedback,
   submitSuggestion,
   getImprovements,
   getCourses,
+  getCategories,
 };

@@ -42,6 +42,17 @@ async function getFeedbackStats(req, res) {
       "SELECT COUNT(*) AS total FROM actions WHERE status != 'resolved'",
     );
 
+    // Category breakdown
+    const [categoryStats] = await db.query(`
+      SELECT
+        COALESCE(category, 'Uncategorized') AS category,
+        COUNT(*) AS count,
+        ROUND(AVG(rating), 2) AS avg_rating
+      FROM feedback
+      GROUP BY category
+      ORDER BY count DESC
+    `);
+
     return res.json({
       success: true,
       stats: {
@@ -49,10 +60,33 @@ async function getFeedbackStats(req, res) {
         courseStats,
         totalSuggestions: suggestionCount.total,
         pendingActions: pendingActions.total,
+        categoryStats,
       },
     });
   } catch (err) {
     console.error("Admin stats error:", err);
+    return res.status(500).json({ success: false, message: "Server error." });
+  }
+}
+
+// GET /admin/feedback-trends - Feedback trends over time (weekly)
+async function getFeedbackTrends(req, res) {
+  try {
+    const [rows] = await db.query(`
+      SELECT
+        DATE_FORMAT(feedback_date, '%Y-%u') AS week_key,
+        MIN(feedback_date) AS week_start,
+        COUNT(*) AS count,
+        ROUND(AVG(rating), 2) AS avg_rating
+      FROM feedback
+      GROUP BY week_key
+      ORDER BY week_key ASC
+      LIMIT 24
+    `);
+
+    return res.json({ success: true, trends: rows });
+  } catch (err) {
+    console.error("Feedback trends error:", err);
     return res.status(500).json({ success: false, message: "Server error." });
   }
 }
@@ -228,6 +262,7 @@ async function getSuggestions(req, res) {
 
 module.exports = {
   getFeedbackStats,
+  getFeedbackTrends,
   recordAction,
   getActions,
   updateActionStatus,

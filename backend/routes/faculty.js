@@ -5,6 +5,8 @@ const { verifyToken, requireRole } = require("../middleware/authMiddleware");
 const {
   getFeedbackSummary,
   getMyCourses,
+  getFeedbackTrends,
+  getQuickSummary,
 } = require("../controllers/facultyController");
 
 router.use(verifyToken, requireRole("faculty", "admin"));
@@ -14,5 +16,11 @@ router.get("/feedback-summary", getFeedbackSummary);
 
 // GET /faculty/courses - List courses assigned to this faculty
 router.get("/courses", getMyCourses);
+
+// GET /faculty/feedback-trends - Feedback trends over time
+router.get("/feedback-trends", getFeedbackTrends);
+
+// GET /faculty/quick-summary - Text-based quick summary
+router.get("/quick-summary", getQuickSummary);
 
 module.exports = router;

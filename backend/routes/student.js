@@ -7,6 +7,7 @@ const {
   submitSuggestion,
   getImprovements,
   getCourses,
+  getCategories,
 } = require("../controllers/studentController");
 
 // All student routes require a valid JWT
@@ -23,5 +24,8 @@ router.post("/suggestion", submitSuggestion);
 
 // GET  /student/improvements - View resolved improvements
 router.get("/improvements", getImprovements);
+
+// GET  /student/categories  - List valid feedback categories
+router.get("/categories", getCategories);
 
 module.exports = router;

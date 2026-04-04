@@ -77,6 +77,17 @@ async function loadCourses() {
   document.getElementById("sg_course").innerHTML = prefix + opts;
 }
 
+// ─── Load categories into dropdown ────────────────────────────
+async function loadCategories() {
+  const data = await api("GET", "/student/categories");
+  if (!data.categories) return;
+  const opts = data.categories
+    .map((c) => `<option value="${escHtml(c)}">${escHtml(c)}</option>`)
+    .join("");
+  document.getElementById("fb_category").innerHTML =
+    '<option value="">-- Select a category (optional) --</option>' + opts;
+}
+
 // ─── Star rating ──────────────────────────────────────────────
 let selectedRating = 0;
 const starLabels = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"];
@@ -118,6 +129,7 @@ document
     const course_id = document.getElementById("fb_course").value;
     const rating = document.getElementById("fb_rating").value;
     const comment = document.getElementById("fb_comment").value.trim();
+    const category = document.getElementById("fb_category").value;
 
     if (!course_id)
       return showInline(msgEl, "Please select a course.", "error");
@@ -125,16 +137,17 @@ document
       return showInline(msgEl, "Please select a star rating.", "error");
 
     btn.disabled = true;
-    btn.classList.add("btn-loading");
+    btn.textContent = "Submitting...";
 
     const data = await api("POST", "/student/feedback", {
       course_id: parseInt(course_id),
       rating: parseInt(rating),
       comment,
+      category: category || undefined,
     });
 
     btn.disabled = false;
-    btn.classList.remove("btn-loading");
+    btn.innerHTML = "&#128274; Submit Anonymously";
 
     if (data.success) {
       showToast(data.message, "success");
@@ -164,7 +177,7 @@ document
       return showInline(msgEl, "Please enter a suggestion.", "error");
 
     btn.disabled = true;
-    btn.classList.add("btn-loading");
+    btn.textContent = "Submitting...";
 
     const data = await api("POST", "/student/suggestion", {
       course_id: parseInt(course_id),
@@ -172,7 +185,7 @@ document
     });
 
     btn.disabled = false;
-    btn.classList.remove("btn-loading");
+    btn.innerHTML = "&#128274; Submit Anonymously";
 
     if (data.success) {
       showToast(data.message, "success");
@@ -228,3 +241,4 @@ function escHtml(str) {
 
 // ─── Init ─────────────────────────────────────────────────────
 loadCourses();
+loadCategories();
