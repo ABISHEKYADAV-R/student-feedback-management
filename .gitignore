@@ -4,10 +4,34 @@ node_modules/
 # Environment variables (keep secrets safe)
 backend/.env
 
-# Logs
+# Database files
+*.sqlite
+*.sqlite3
+
+# Migration scripts (one-time use)
+backend/migrate.js
+
+# Logs & debug output
 *.log
 npm-debug.log*
+backend/out.txt
 
 # OS files
 .DS_Store
 Thumbs.db
+
+# Build / dist artifacts
+.dist/
+dist/
+
+# Lock files at root (only backend/package-lock.json matters)
+/package-lock.json
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temp files
+tracked_files.txt
