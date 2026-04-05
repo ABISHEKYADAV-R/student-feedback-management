@@ -28,11 +28,11 @@ function selectRole(role) {
   if (role === 'student') {
     loginRoleTitle.textContent = "Student Login";
     loginRoleIcon.innerHTML = "&#127891;";
-    demoCredentialsList.innerHTML = `<span class="cred-item">alice@student.com / student123</span>`;
+    demoCredentialsList.innerHTML = `<span class="cred-item">ram@student.com / student123</span>`;
   } else if (role === 'faculty') {
     loginRoleTitle.textContent = "Faculty Login";
     loginRoleIcon.innerHTML = "&#128104;&#8205;&#127979;";
-    demoCredentialsList.innerHTML = `<span class="cred-item">smith@college.com / faculty123</span>`;
+    demoCredentialsList.innerHTML = `<span class="cred-item">ramesh@college.com / faculty123</span>`;
   } else if (role === 'admin') {
     loginRoleTitle.textContent = "Admin Login";
     loginRoleIcon.innerHTML = "&#128187;";
