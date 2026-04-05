@@ -35,3 +35,5 @@ dist/
 
 # Temp files
 tracked_files.txt
+
+.vercel

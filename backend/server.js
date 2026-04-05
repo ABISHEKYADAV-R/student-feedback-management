@@ -38,24 +38,28 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "frontend", "index.html"));
 });
 
-// ─── Start server ─────────────────────────────────────────────────────────────
-const initDb = require("./config/initDb");
-
-if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+// ─── Local startup only (Vercel serverless imports app as a handler) ──────────
+if (process.env.VERCEL !== "1") {
   const PORT = process.env.PORT || 5002;
-  (async () => {
-    try {
-      await initDb();
-      app.listen(PORT, () => {
-        console.log(`🚀 Server running at http://localhost:${PORT}`);
-      });
-    } catch (err) {
-      console.error("❌ Database initialization failed:", err.message);
-    }
-  })();
-} else {
-  // On Vercel, simply initialize the connection check
-  initDb().catch(err => console.error("❌ DB connection failed:", err.message));
+
+  function startServer(port) {
+    const server = app.listen(port, () => {
+      console.log(`🚀 Server running at http://localhost:${port}`);
+      console.log(`   Frontend: http://localhost:${port}`);
+      console.log(`   API:      http://localhost:${port}/api/health`);
+    });
+    server.on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        console.warn(`⚠️  Port ${port} is in use, trying port ${port + 1}...`);
+        startServer(port + 1);
+      } else {
+        console.error("❌ Server error:", err.message);
+        process.exit(1);
+      }
+    });
+  }
+
+  startServer(PORT);
 }
 
 module.exports = app;

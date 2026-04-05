@@ -7,7 +7,13 @@ async function initDb() {
     const [rows] = await db.query("SHOW TABLES LIKE 'users'");
     if (rows.length === 0) {
       console.log("🛠️ Database is empty. Running schema.sql...");
-      const schemaPath = path.join(__dirname, "..", "..", "database", "schema.sql");
+      const schemaPath = path.join(
+        __dirname,
+        "..",
+        "..",
+        "database",
+        "schema.sql",
+      );
       const sqlContent = await fs.readFile(schemaPath, "utf-8");
       await db.query(sqlContent);
       console.log("✅ Database successfully initialized on Vercel.");
@@ -16,9 +22,7 @@ async function initDb() {
     }
   } catch (err) {
     console.error("❌ Database initialization error:", err.message);
-    if (process.env.NODE_ENV !== "production") {
-      throw err;
-    }
+    throw err;
   }
 }
 
