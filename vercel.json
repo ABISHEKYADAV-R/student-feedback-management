@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(css|js|img|assets)/(.*)",
+      "dest": "/frontend/$1/$2"
+    },
+    {
+      "src": "/(.*)\\.(html|json|png|jpg|ico|svg)",
+      "dest": "/frontend/$1.$2"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/backend/server.js"
+    },
+    {
+      "src": "/(login|student|faculty|admin|register)(.*)",
+      "dest": "/backend/server.js"
+    },
+    {
+      "src": "/$",
+      "dest": "/frontend/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/backend/server.js"
+    }
+  ]
+}

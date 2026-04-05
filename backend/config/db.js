@@ -10,8 +10,9 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_NAME || "student_feedback_db",
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 5, // Lower for serverless
   queueLimit: 0,
+  connectTimeout: 10000,
 });
 
 // Promisify for async/await support

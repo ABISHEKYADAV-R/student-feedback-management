@@ -8,7 +8,7 @@ async function initDb() {
     await db.query("SELECT 1");
     console.log("✅ Database ready.");
   } catch (e) {
-    throw new Error("Failed to connect to SQLite database: " + e.message);
+    throw new Error("Failed to connect to Database: " + e.message);
   }
 }
 
