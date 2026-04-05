@@ -1,4 +1,4 @@
-// js/student.js - Student dashboard logic
+// js/student.js - Student dashboard logic (enhanced UI)
 const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
 const API = isLocalhost ? "http://localhost:5002" : window.location.origin;
 
@@ -11,6 +11,16 @@ if (!token || !user || user.role !== "student") {
 }
 
 document.getElementById("navUser").textContent = `Hello, ${user.name}`;
+
+// Populate mobile nav
+const mobileAvatar = document.getElementById("mobileAvatar");
+const mobileUserName = document.getElementById("mobileUserName");
+if (mobileAvatar) mobileAvatar.textContent = (user.name || "S").charAt(0).toUpperCase();
+if (mobileUserName) mobileUserName.textContent = user.name || "Student";
+
+// Populate welcome title
+const welcomeTitle = document.getElementById("welcomeTitle");
+if (welcomeTitle) welcomeTitle.textContent = `Welcome, ${user.name.split(" ")[0]}!`;
 
 function logout() {
   localStorage.clear();
@@ -30,20 +40,6 @@ async function api(method, path, body) {
   return res.json();
 }
 
-// ─── Toast notifications ──────────────────────────────────────
-function showToast(msg, type = "success") {
-  const icons = { success: "✅", error: "❌", info: "ℹ️" };
-  const container = document.getElementById("toastContainer");
-  const toast = document.createElement("div");
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `<span class="toast-icon">${icons[type] || "ℹ️"}</span><span>${msg}</span>`;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.animation = "slideOut 0.3s ease forwards";
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
-}
-
 // ─── Tabs ─────────────────────────────────────────────────────
 document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -54,7 +50,9 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
       .querySelectorAll(".tab-content")
       .forEach((t) => t.classList.remove("active"));
     btn.classList.add("active");
-    document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
+    const tabEl = document.getElementById(`tab-${btn.dataset.tab}`);
+    tabEl.classList.add("active");
+    
     if (btn.dataset.tab === "improvements") loadImprovements();
   });
 });
@@ -111,6 +109,15 @@ document.querySelectorAll(".star").forEach((star) => {
     document.getElementById("starHint").textContent =
       starLabels[selectedRating];
   });
+  // Touch support
+  star.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    selectedRating = parseInt(star.dataset.val);
+    document.getElementById("fb_rating").value = selectedRating;
+    highlightStars(selectedRating);
+    document.getElementById("starHint").textContent =
+      starLabels[selectedRating];
+  });
 });
 
 function highlightStars(val) {
@@ -137,7 +144,7 @@ document
       return showInline(msgEl, "Please select a star rating.", "error");
 
     btn.disabled = true;
-    btn.textContent = "Submitting...";
+    btn.classList.add("btn-loading");
 
     const data = await api("POST", "/student/feedback", {
       course_id: parseInt(course_id),
@@ -147,7 +154,7 @@ document
     });
 
     btn.disabled = false;
-    btn.innerHTML = "&#128274; Submit Anonymously";
+    btn.classList.remove("btn-loading");
 
     if (data.success) {
       showToast(data.message, "success");
@@ -157,6 +164,7 @@ document
       highlightStars(0);
       document.getElementById("starHint").textContent = "Click a star to rate";
     } else {
+      showToast(data.message, "error");
       showInline(msgEl, data.message, "error");
     }
   });
@@ -177,7 +185,7 @@ document
       return showInline(msgEl, "Please enter a suggestion.", "error");
 
     btn.disabled = true;
-    btn.textContent = "Submitting...";
+    btn.classList.add("btn-loading");
 
     const data = await api("POST", "/student/suggestion", {
       course_id: parseInt(course_id),
@@ -185,13 +193,14 @@ document
     });
 
     btn.disabled = false;
-    btn.innerHTML = "&#128274; Submit Anonymously";
+    btn.classList.remove("btn-loading");
 
     if (data.success) {
       showToast(data.message, "success");
       msgEl.classList.add("hidden");
       this.reset();
     } else {
+      showToast(data.message, "error");
       showInline(msgEl, data.message, "error");
     }
   });
@@ -199,20 +208,19 @@ document
 // ─── Load Improvements ────────────────────────────────────────
 async function loadImprovements() {
   const el = document.getElementById("improvementsList");
-  el.innerHTML =
-    '<p class="loading"><span class="spinner"></span> Loading...</p>';
+  el.innerHTML = skeletonComments(3);
 
   const data = await api("GET", "/student/improvements");
 
   if (!data.improvements || data.improvements.length === 0) {
-    el.innerHTML = '<p class="empty-msg">No improvements recorded yet.</p>';
+    el.innerHTML = emptyState("No Improvements Yet", "Once administration takes action on feedback, improvements will appear here.");
     return;
   }
 
   el.innerHTML = data.improvements
     .map(
-      (imp) => `
-      <div class="improvement-item">
+      (imp, i) => `
+      <div class="improvement-item animate-in" style="animation-delay:${i * 0.06}s">
         <h4>${escHtml(imp.course_name)}</h4>
         <p><strong>Issue:</strong> ${escHtml(imp.issue_description)}</p>
         <p><strong>Action taken:</strong> ${escHtml(imp.action_taken)}</p>
@@ -228,15 +236,6 @@ function showInline(el, msg, type) {
   el.textContent = msg;
   el.className = `alert alert-${type === "error" ? "error" : "success"}`;
   setTimeout(() => el.classList.add("hidden"), 4000);
-}
-
-function escHtml(str) {
-  return (str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }
 
 // ─── Init ─────────────────────────────────────────────────────

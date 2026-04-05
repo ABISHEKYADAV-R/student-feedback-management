@@ -4,14 +4,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Student Feedback System</title>
+  <title>Smart Student Feedback System — Login</title>
+  <meta name="description" content="Login to the Smart Student Feedback System. Submit anonymous feedback, view analytics, and manage courses." />
   <meta name="theme-color" content="#6366f1" />
+  <meta name="robots" content="index, follow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="css/style.css" />
   <script src="js/theme.js"></script>
 </head>
 
 <body class="auth-page">
-  <button class="btn btn-outline btn-sm theme-toggle" title="Toggle Theme" style="position: absolute; top: 24px; right: 24px; border-radius: 50%; padding: 8px 12px; font-size: 1.1rem; box-shadow: var(--shadow-sm);">
+  <button class="btn btn-outline btn-sm theme-toggle" id="themeToggleBtn" title="Toggle Theme" style="position: absolute; top: 24px; right: 24px; border-radius: 50%; padding: 8px 12px; font-size: 1.1rem; box-shadow: var(--shadow-sm);">
     <span class="icon">☀️</span>
   </button>
   <div class="auth-container">
@@ -29,7 +33,7 @@
 
     <!-- Role Selection Screen -->
     <div id="roleSelection" class="role-cards">
-      <div class="role-card" onclick="selectRole('student')">
+      <div class="role-card" onclick="selectRole('student')" id="role-student">
         <span class="role-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -41,7 +45,7 @@
         <p>Submit feedback and suggestions</p>
       </div>
 
-      <div class="role-card" onclick="selectRole('faculty')">
+      <div class="role-card" onclick="selectRole('faculty')" id="role-faculty">
         <span class="role-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -55,7 +59,7 @@
         <p>View course feedback & ratings</p>
       </div>
 
-      <div class="role-card" onclick="selectRole('admin')">
+      <div class="role-card" onclick="selectRole('admin')" id="role-admin">
         <span class="role-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -115,6 +119,7 @@
 
   </div>
 
+  <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
 </body>
 

@@ -1,4 +1,4 @@
-// js/admin.js - Admin dashboard logic
+// js/admin.js - Admin dashboard logic (enhanced UI)
 const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
 const API = isLocalhost ? "http://localhost:5002" : window.location.origin;
 
@@ -11,6 +11,16 @@ if (!token || !user || user.role !== "admin") {
 }
 
 document.getElementById("navUser").textContent = `Hello, ${user.name}`;
+
+// Populate mobile nav
+const mobileAvatar = document.getElementById("mobileAvatar");
+const mobileUserName = document.getElementById("mobileUserName");
+if (mobileAvatar) mobileAvatar.textContent = (user.name || "A").charAt(0).toUpperCase();
+if (mobileUserName) mobileUserName.textContent = user.name || "Admin";
+
+// Welcome title
+const welcomeTitle = document.getElementById("welcomeTitle");
+if (welcomeTitle) welcomeTitle.textContent = `Welcome, ${user.name.split(" ")[0]}!`;
 
 function logout() {
   localStorage.clear();
@@ -28,6 +38,31 @@ async function api(method, path, body) {
     body: body ? JSON.stringify(body) : undefined,
   });
   return res.json();
+}
+
+// ─── Show skeleton loaders on init ────────────────────────────
+function showSkeletons() {
+  const statsEl = document.getElementById("overviewStats");
+  if (statsEl) statsEl.innerHTML = skeletonStatCards(4);
+
+  const barsEl = document.getElementById("ratingBars");
+  if (barsEl) barsEl.innerHTML = `
+    <div class="skeleton skeleton-text long" style="height:18px; margin-bottom:14px;"></div>
+    <div class="skeleton skeleton-text long" style="height:18px; margin-bottom:14px;"></div>
+    <div class="skeleton skeleton-text medium" style="height:18px; margin-bottom:14px;"></div>
+    <div class="skeleton skeleton-text short" style="height:18px; margin-bottom:14px;"></div>
+    <div class="skeleton skeleton-text short" style="height:18px;"></div>
+  `;
+
+  const courseEl = document.getElementById("courseTable");
+  if (courseEl) courseEl.innerHTML = skeletonTableRows(4, 5);
+
+  const catEl = document.getElementById("categoryStats");
+  if (catEl) catEl.innerHTML = `
+    <div class="skeleton skeleton-text long" style="height:16px; margin-bottom:12px;"></div>
+    <div class="skeleton skeleton-text medium" style="height:16px; margin-bottom:12px;"></div>
+    <div class="skeleton skeleton-text short" style="height:16px;"></div>
+  `;
 }
 
 // ─── Tabs ─────────────────────────────────────────────────────
@@ -58,37 +93,41 @@ async function loadStats() {
   const t = data.stats.totals;
   const cs = data.stats.courseStats || [];
 
-  // Stat cards
+  // Stat cards (staggered)
   document.getElementById("overviewStats").innerHTML = `
-    <div class="stat-card">
+    <div class="stat-card blue animate-in" style="animation-delay:0s">
+      <div class="stat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
       <div class="stat-value">${t.total_feedback || 0}</div>
       <div class="stat-label">Total Feedback</div>
     </div>
-    <div class="stat-card green">
+    <div class="stat-card green animate-in" style="animation-delay:0.06s">
+      <div class="stat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
       <div class="stat-value">${t.overall_avg_rating || "—"}</div>
       <div class="stat-label">Overall Avg Rating</div>
     </div>
-    <div class="stat-card orange">
+    <div class="stat-card orange animate-in" style="animation-delay:0.12s">
+      <div class="stat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
       <div class="stat-value">${data.stats.totalSuggestions || 0}</div>
       <div class="stat-label">Suggestions</div>
     </div>
-    <div class="stat-card red">
+    <div class="stat-card red animate-in" style="animation-delay:0.18s">
+      <div class="stat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></div>
       <div class="stat-value">${data.stats.pendingActions || 0}</div>
       <div class="stat-label">Pending Actions</div>
     </div>
   `;
 
-  // Rating breakdown bars
+  // Rating breakdown bars (animated)
   const total = Number(t.total_feedback) || 1;
   const bars = [5, 4, 3, 2, 1]
-    .map((star) => {
+    .map((star, i) => {
       const count = Number(t[`${numberToWord(star)}_star`] || 0);
       const pct = Math.round((count / total) * 100);
       return `
-      <div class="rating-bar-row">
+      <div class="rating-bar-row animate-in" style="animation-delay:${i * 0.06}s">
         <div class="rating-bar-label">${"★".repeat(star)} ${star}</div>
         <div class="rating-bar-track">
-          <div class="rating-bar-fill" style="width:${pct}%"></div>
+          <div class="rating-bar-fill" style="width:0%" data-target="${pct}"></div>
         </div>
         <div class="rating-bar-count">${count}</div>
       </div>`;
@@ -96,7 +135,16 @@ async function loadStats() {
     .join("");
   document.getElementById("ratingBars").innerHTML = bars;
 
-  // ── Rating Distribution chart (Bug fix: actually render Chart.js) ──
+  // Animate bars after render
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      document.querySelectorAll(".rating-bar-fill").forEach((bar) => {
+        bar.style.width = bar.dataset.target + "%";
+      });
+    }, 100);
+  });
+
+  // ── Rating Distribution chart ──
   const starCounts = [1, 2, 3, 4, 5].map(
     (star) => Number(t[`${numberToWord(star)}_star`] || 0)
   );
@@ -108,23 +156,17 @@ async function loadStats() {
       type: "doughnut",
       data: {
         labels: ["1 Star", "2 Stars", "3 Stars", "4 Stars", "5 Stars"],
-        datasets: [
-          {
-            data: starCounts,
-            backgroundColor: [
-              "#ef4444",
-              "#f97316",
-              "#eab308",
-              "#22c55e",
-              "#6366f1",
-            ],
-            borderWidth: 0,
-          },
-        ],
+        datasets: [{
+          data: starCounts,
+          backgroundColor: ["#ef4444", "#f97316", "#eab308", "#22c55e", "#6366f1"],
+          borderWidth: 0,
+          hoverOffset: 6,
+        }],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: { animateRotate: true, duration: 800, easing: "easeOutQuart" },
         plugins: {
           legend: {
             position: "bottom",
@@ -132,6 +174,7 @@ async function loadStats() {
               color: getComputedStyle(document.body).getPropertyValue("--text") || "#333",
               padding: 12,
               usePointStyle: true,
+              font: { family: "'Poppins', sans-serif", size: 12 },
             },
           },
         },
@@ -144,12 +187,12 @@ async function loadStats() {
   const catEl = document.getElementById("categoryStats");
   if (catEl) {
     if (catStats.length === 0) {
-      catEl.innerHTML = '<p class="empty-msg">No category data yet.</p>';
+      catEl.innerHTML = emptyState("No Category Data", "Category breakdown will appear once categorized feedback is submitted.");
     } else {
       catEl.innerHTML = catStats
         .map(
-          (c) => `
-        <div class="category-row">
+          (c, i) => `
+        <div class="category-row animate-in" style="animation-delay:${i * 0.04}s">
           <span class="category-name">${escHtml(c.category)}</span>
           <span class="category-count">${c.count} feedback${c.count > 1 ? "s" : ""}</span>
           <span class="category-rating">★ ${c.avg_rating || "—"}</span>
@@ -169,7 +212,7 @@ function numberToWord(n) {
 }
 
 function buildCourseTable(courses) {
-  if (!courses.length) return '<p class="empty-msg">No courses found.</p>';
+  if (!courses.length) return emptyState("No Courses", "Add courses using the 'Add Course' tab.");
   return `
     <div class="table-wrapper">
       <table class="data-table">
@@ -186,9 +229,9 @@ function buildCourseTable(courses) {
           ${courses
             .map(
               (c, i) => `
-            <tr>
+            <tr class="animate-in" style="animation-delay:${i * 0.03}s">
               <td>${i + 1}</td>
-              <td>${escHtml(c.course_name)}</td>
+              <td><strong>${escHtml(c.course_name)}</strong></td>
               <td>${escHtml(c.faculty_name || "Unassigned")}</td>
               <td>${c.total_feedback}</td>
               <td>${c.avg_rating ? "★ " + c.avg_rating : "—"}</td>
@@ -208,7 +251,7 @@ async function loadTrends() {
   const data = await api("GET", "/admin/feedback-trends");
   if (!data.success || !data.trends || data.trends.length === 0) {
     const el = document.getElementById("trendsChart");
-    if (el) el.parentElement.innerHTML = '<p class="empty-msg">No trend data available yet. Trends will appear once feedback is submitted over multiple dates.</p>';
+    if (el) el.parentElement.innerHTML = emptyState("No Trend Data", "Trends will appear once feedback is submitted over multiple dates.");
     return;
   }
 
@@ -239,7 +282,8 @@ async function loadTrends() {
           fill: true,
           yAxisID: "y",
           pointRadius: 4,
-          pointHoverRadius: 6,
+          pointHoverRadius: 7,
+          pointBackgroundColor: "#6366f1",
         },
         {
           label: "Feedback Count",
@@ -250,43 +294,53 @@ async function loadTrends() {
           fill: true,
           yAxisID: "y1",
           pointRadius: 4,
-          pointHoverRadius: 6,
+          pointHoverRadius: 7,
+          pointBackgroundColor: "#22c55e",
         },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: { duration: 1000, easing: "easeOutQuart" },
       interaction: { mode: "index", intersect: false },
       plugins: {
         legend: {
           labels: {
             color: textColor,
             usePointStyle: true,
+            font: { family: "'Poppins', sans-serif", size: 12 },
           },
+        },
+        tooltip: {
+          backgroundColor: "rgba(0,0,0,0.8)",
+          titleFont: { family: "'Poppins', sans-serif" },
+          bodyFont: { family: "'Poppins', sans-serif" },
+          cornerRadius: 8,
+          padding: 12,
         },
       },
       scales: {
         y: {
           type: "linear",
           position: "left",
-          title: { display: true, text: "Avg Rating", color: textColor },
+          title: { display: true, text: "Avg Rating", color: textColor, font: { family: "'Poppins', sans-serif" } },
           min: 0,
           max: 5,
           ticks: { color: textColor },
-          grid: { color: "rgba(128,128,128,0.15)" },
+          grid: { color: "rgba(128,128,128,0.1)" },
         },
         y1: {
           type: "linear",
           position: "right",
-          title: { display: true, text: "Count", color: textColor },
+          title: { display: true, text: "Count", color: textColor, font: { family: "'Poppins', sans-serif" } },
           min: 0,
           ticks: { color: textColor },
           grid: { drawOnChartArea: false },
         },
         x: {
           ticks: { color: textColor },
-          grid: { color: "rgba(128,128,128,0.15)" },
+          grid: { color: "rgba(128,128,128,0.1)" },
         },
       },
     },
@@ -296,13 +350,13 @@ async function loadTrends() {
 // ─── Load actions ─────────────────────────────────────────────
 async function loadActions(status = "") {
   const el = document.getElementById("actionsList");
-  el.innerHTML = '<p class="loading">Loading...</p>';
+  el.innerHTML = skeletonTableRows(4, 6);
 
   const path = "/admin/actions" + (status ? `?status=${status}` : "");
   const data = await api("GET", path);
 
   if (!data.actions || data.actions.length === 0) {
-    el.innerHTML = '<p class="empty-msg">No actions recorded yet.</p>';
+    el.innerHTML = emptyState("No Actions Yet", "Record actions to track improvements.");
     return;
   }
 
@@ -316,14 +370,14 @@ async function loadActions(status = "") {
           ${data.actions
             .map(
               (a, i) => `
-            <tr>
+            <tr class="animate-in" style="animation-delay:${i * 0.03}s">
               <td>${i + 1}</td>
-              <td>${escHtml(a.course_name)}</td>
+              <td><strong>${escHtml(a.course_name)}</strong></td>
               <td>${escHtml(a.issue_description)}</td>
               <td>${escHtml(a.action_taken)}</td>
               <td><span class="badge badge-${a.status}">${a.status}</span></td>
               <td>
-                <select onchange="updateStatus(${a.action_id}, this.value)" style="padding:4px 8px;border:1px solid #dee2e6;border-radius:6px;font-size:.8rem;">
+                <select class="status-select" onchange="updateStatus(${a.action_id}, this.value)">
                   <option value="pending"     ${a.status === "pending" ? "selected" : ""}>Pending</option>
                   <option value="in-progress" ${a.status === "in-progress" ? "selected" : ""}>In Progress</option>
                   <option value="resolved"    ${a.status === "resolved" ? "selected" : ""}>Resolved</option>
@@ -340,8 +394,12 @@ async function loadActions(status = "") {
 
 async function updateStatus(id, status) {
   const data = await api("PUT", `/admin/action/${id}`, { status });
-  if (data.success)
+  if (data.success) {
+    showToast("Status updated successfully!", "success");
     loadActions(document.getElementById("actionStatusFilter").value);
+  } else {
+    showToast("Failed to update status.", "error");
+  }
 }
 
 window.filterActions = (status) => loadActions(status);
@@ -349,12 +407,12 @@ window.filterActions = (status) => loadActions(status);
 // ─── Load suggestions ─────────────────────────────────────────
 async function loadSuggestions() {
   const el = document.getElementById("suggestionsList");
-  el.innerHTML = '<p class="loading">Loading...</p>';
+  el.innerHTML = skeletonTableRows(4, 4);
 
   const data = await api("GET", "/admin/suggestions");
 
   if (!data.suggestions || data.suggestions.length === 0) {
-    el.innerHTML = '<p class="empty-msg">No suggestions yet.</p>';
+    el.innerHTML = emptyState("No Suggestions Yet", "Student suggestions will appear here.");
     return;
   }
 
@@ -366,11 +424,11 @@ async function loadSuggestions() {
           ${data.suggestions
             .map(
               (s, i) => `
-            <tr>
+            <tr class="animate-in" style="animation-delay:${i * 0.03}s">
               <td>${i + 1}</td>
-              <td>${escHtml(s.course_name)}</td>
+              <td><strong>${escHtml(s.course_name)}</strong></td>
               <td>${escHtml(s.suggestion)}</td>
-              <td>${new Date(s.created_at).toLocaleDateString()}</td>
+              <td>${new Date(s.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
             </tr>
           `,
             )
@@ -395,19 +453,28 @@ document
   .addEventListener("submit", async function (e) {
     e.preventDefault();
     const msgEl = document.getElementById("acMsg");
+    const btn = document.getElementById("addCourseBtn");
     const course_name = document.getElementById("ac_name").value.trim();
     const faculty_id = document.getElementById("ac_faculty").value || null;
+
+    btn.disabled = true;
+    btn.classList.add("btn-loading");
 
     const data = await api("POST", "/admin/course", {
       course_name,
       faculty_id: faculty_id ? parseInt(faculty_id) : null,
     });
 
+    btn.disabled = false;
+    btn.classList.remove("btn-loading");
+
     if (data.success) {
+      showToast("Course added successfully!", "success");
       showMsg(msgEl, "Course added successfully!", "success");
       this.reset();
       loadStats(); // refresh
     } else {
+      showToast(data.message, "error");
       showMsg(msgEl, data.message, "error");
     }
   });
@@ -432,12 +499,19 @@ document
   .addEventListener("submit", async function (e) {
     e.preventDefault();
     const msgEl = document.getElementById("raMsg");
+    const btn = document.getElementById("recordActionBtn");
     const course_id = document.getElementById("ra_course").value;
     const issue_description = document.getElementById("ra_issue").value.trim();
     const action_taken = document.getElementById("ra_action").value.trim();
     const status = document.getElementById("ra_status").value;
 
-    if (!course_id) return showMsg(msgEl, "Please select a course.", "error");
+    if (!course_id) {
+      showToast("Please select a course.", "warning");
+      return showMsg(msgEl, "Please select a course.", "error");
+    }
+
+    btn.disabled = true;
+    btn.classList.add("btn-loading");
 
     const data = await api("POST", "/admin/action", {
       course_id: parseInt(course_id),
@@ -446,10 +520,15 @@ document
       status,
     });
 
+    btn.disabled = false;
+    btn.classList.remove("btn-loading");
+
     if (data.success) {
+      showToast("Action recorded successfully!", "success");
       showMsg(msgEl, "Action recorded successfully!", "success");
       this.reset();
     } else {
+      showToast(data.message, "error");
       showMsg(msgEl, data.message, "error");
     }
   });
@@ -461,16 +540,8 @@ function showMsg(el, msg, type) {
   setTimeout(() => el.classList.add("hidden"), 5000);
 }
 
-function escHtml(str) {
-  return (str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
 // ─── Init ─────────────────────────────────────────────────────
+showSkeletons();
 loadStats();
 loadTrends();
 loadFacultyDropdown();

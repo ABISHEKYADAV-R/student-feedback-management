@@ -1,4 +1,4 @@
-// js/auth.js - Login page logic
+// js/auth.js - Login page logic (enhanced UI)
 const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
 const API = isLocalhost ? "http://localhost:5002" : window.location.origin;
 
@@ -39,24 +39,43 @@ function selectRole(role) {
     demoCredentialsList.innerHTML = `<span class="cred-item">admin@college.com / admin123</span>`;
   }
 
-  // Hide selection, show form
-  roleSelection.style.display = "none";
-  loginSection.style.display = "block";
+  // Animated transition
+  roleSelection.style.animation = "none";
+  roleSelection.offsetHeight;
+  roleSelection.style.opacity = "0";
+  roleSelection.style.transform = "translateY(-10px)";
+  roleSelection.style.transition = "opacity 0.25s ease, transform 0.25s ease";
   
-  // Clear previous errors/inputs
-  document.getElementById("loginError").classList.add("hidden");
-  document.getElementById("email").value = "";
-  document.getElementById("password").value = "";
-  
-  // Quick fade-in animation
-  loginSection.style.animation = "none";
-  loginSection.offsetHeight; /* trigger reflow */
-  loginSection.style.animation = null;
+  setTimeout(() => {
+    roleSelection.style.display = "none";
+    loginSection.style.display = "block";
+    loginSection.style.animation = "fadeInUp 0.35s ease-out";
+
+    // Clear previous errors/inputs
+    document.getElementById("loginError").classList.add("hidden");
+    document.getElementById("email").value = "";
+    document.getElementById("password").value = "";
+    
+    // Focus email field
+    setTimeout(() => document.getElementById("email").focus(), 100);
+  }, 200);
 }
 
 function showRoleSelection() {
-  loginSection.style.display = "none";
-  roleSelection.style.display = "grid";
+  loginSection.style.animation = "none";
+  loginSection.style.opacity = "0";
+  loginSection.style.transition = "opacity 0.2s ease";
+  
+  setTimeout(() => {
+    loginSection.style.display = "none";
+    loginSection.style.opacity = "";
+    loginSection.style.transition = "";
+    roleSelection.style.display = "grid";
+    roleSelection.style.opacity = "";
+    roleSelection.style.transform = "";
+    roleSelection.style.transition = "";
+    roleSelection.style.animation = "fadeInUp 0.35s ease-out";
+  }, 200);
 }
 
 // ─── Login form ───────────────────────────────────────────────
@@ -73,6 +92,7 @@ document
 
     errEl.classList.add("hidden");
     btn.disabled = true;
+    btn.classList.add("btn-loading");
     btn.textContent = "Signing in...";
 
     try {
@@ -93,16 +113,24 @@ document
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      // Redirect based on role
-      const userRole = data.user.role;
-      if (userRole === "admin") window.location.href = "admin-dashboard.html";
-      else if (userRole === "faculty")
-        window.location.href = "faculty-dashboard.html";
-      else window.location.href = "student-dashboard.html";
+      // Show success toast (brief)
+      if (typeof showToast === "function") {
+        showToast("Login successful! Redirecting...", "success", 1500);
+      }
+
+      // Redirect based on role (with slight delay for toast)
+      setTimeout(() => {
+        const userRole = data.user.role;
+        if (userRole === "admin") window.location.href = "admin-dashboard.html";
+        else if (userRole === "faculty")
+          window.location.href = "faculty-dashboard.html";
+        else window.location.href = "student-dashboard.html";
+      }, 400);
     } catch (err) {
       showError(errEl, "Could not connect to server. Is the backend running?");
     } finally {
       btn.disabled = false;
+      btn.classList.remove("btn-loading");
       btn.textContent = "Sign In";
     }
   });
