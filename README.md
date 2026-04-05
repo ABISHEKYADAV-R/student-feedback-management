@@ -102,9 +102,4 @@ Use these seeded accounts to test different roles (Password for all: `student123
 - `feedback_tracking (student_id + target_id unique constraint)`
 - `actions (status enum)`
 
-## ☁️ Vercel Deployment
-
-This repository is configured for serverless deployment on Vercel:
-1. Ensure your MySQL database is remotely hosted (e.g., Aiven, PlanetScale, AWS RDS).
-2. Set the `DB_*` environment variables in Vercel.
-3. The `vercel.json` will route `/api/*` to the Node.js backend while serving the static `frontend/` files on the root domain.
+## ☁️ Render Deployment - https://student-feedback-management.onrender.com
