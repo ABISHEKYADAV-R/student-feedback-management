@@ -8,6 +8,7 @@ const {
   getImprovements,
   getCourses,
   getCategories,
+  getFacilities,
 } = require("../controllers/studentController");
 
 // All student routes require a valid JWT
@@ -15,6 +16,9 @@ router.use(verifyToken);
 
 // GET  /student/courses     - List all courses (for dropdowns)
 router.get("/courses", getCourses);
+
+// GET  /student/facilities  - List all facilities
+router.get("/facilities", getFacilities);
 
 // POST /student/feedback    - Submit anonymous feedback
 router.post("/feedback", submitFeedback);

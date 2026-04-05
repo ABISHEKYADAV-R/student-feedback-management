@@ -205,6 +205,16 @@ async function loadStats() {
 
   // Course table
   document.getElementById("courseTable").innerHTML = buildCourseTable(cs);
+  
+  // Create Facility table if facilityStats exists
+  if (data.stats.facilityStats) {
+      const facilityTableHtml = buildFacilityTable(data.stats.facilityStats);
+      // Append it after course table
+      document.getElementById("courseTable").insertAdjacentHTML('afterend', `
+        <h4 style="margin-top: 24px; margin-bottom: 12px;">All Facilities</h4>
+        ${facilityTableHtml}
+      `);
+  }
 }
 
 function numberToWord(n) {
@@ -235,6 +245,37 @@ function buildCourseTable(courses) {
               <td>${escHtml(c.faculty_name || "Unassigned")}</td>
               <td>${c.total_feedback}</td>
               <td>${c.avg_rating ? "★ " + c.avg_rating : "—"}</td>
+            </tr>
+          `,
+            )
+            .join("")}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function buildFacilityTable(facilities) {
+  if (!facilities.length) return emptyState("No Facilities", "No facility data available.");
+  return `
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Facility Name</th>
+            <th>Total Feedback</th>
+            <th>Avg Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${facilities
+            .map(
+              (f, i) => `
+            <tr class="animate-in" style="animation-delay:${i * 0.03}s">
+              <td>${i + 1}</td>
+              <td><strong>${escHtml(f.facility_name)}</strong></td>
+              <td>${f.total_feedback}</td>
+              <td>${f.avg_rating ? "★ " + f.avg_rating : "—"}</td>
             </tr>
           `,
             )
@@ -364,7 +405,7 @@ async function loadActions(status = "") {
     <div class="table-wrapper">
       <table class="data-table">
         <thead>
-          <tr><th>#</th><th>Course</th><th>Issue</th><th>Action Taken</th><th>Status</th><th>Update</th></tr>
+          <tr><th>#</th><th>Target</th><th>Issue</th><th>Action Taken</th><th>Status</th><th>Update</th></tr>
         </thead>
         <tbody>
           ${data.actions
@@ -372,7 +413,7 @@ async function loadActions(status = "") {
               (a, i) => `
             <tr class="animate-in" style="animation-delay:${i * 0.03}s">
               <td>${i + 1}</td>
-              <td><strong>${escHtml(a.course_name)}</strong></td>
+              <td><strong>${escHtml(a.course_name || a.facility_name || 'General')}</strong></td>
               <td>${escHtml(a.issue_description)}</td>
               <td>${escHtml(a.action_taken)}</td>
               <td><span class="badge badge-${a.status}">${a.status}</span></td>
@@ -419,14 +460,14 @@ async function loadSuggestions() {
   el.innerHTML = `
     <div class="table-wrapper">
       <table class="data-table">
-        <thead><tr><th>#</th><th>Course</th><th>Suggestion</th><th>Date</th></tr></thead>
+        <thead><tr><th>#</th><th>Target</th><th>Suggestion</th><th>Date</th></tr></thead>
         <tbody>
           ${data.suggestions
             .map(
               (s, i) => `
             <tr class="animate-in" style="animation-delay:${i * 0.03}s">
               <td>${i + 1}</td>
-              <td><strong>${escHtml(s.course_name)}</strong></td>
+              <td><strong>${escHtml(s.course_name || s.facility_name || 'General')}</strong></td>
               <td>${escHtml(s.suggestion)}</td>
               <td>${new Date(s.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
             </tr>
@@ -493,6 +534,36 @@ async function loadCoursesForAction() {
     '<option value="">-- Select a course --</option>' + opts;
 }
 
+// ─── Load facilities for Record Action dropdown ──────────────────
+async function loadFacilitiesForAction() {
+  const data = await api("GET", "/student/facilities"); // Reusing student route as it's public/open or we can just fetch
+  if (!data.facilities) return;
+  const opts = data.facilities
+    .map(
+      (f) =>
+        `<option value="${f.facility_id}">${escHtml(f.facility_name)}</option>`,
+    )
+    .join("");
+  document.getElementById("ra_facility").innerHTML =
+    '<option value="">-- Select a facility --</option>' + opts;
+}
+
+// ─── Toggles ──────────────────────────────────────────────────
+function setupAdminToggles() {
+  document.querySelectorAll('input[name="ra_type"]').forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      document.getElementById("lbl_ra_type_course").classList.remove("active");
+      document.getElementById("lbl_ra_type_facility").classList.remove("active");
+      document.getElementById(`lbl_ra_type_${e.target.value}`).classList.add("active");
+
+      document.getElementById("ra_course_group").style.display = e.target.value === "course" ? "block" : "none";
+      document.getElementById("ra_facility_group").style.display = e.target.value === "facility" ? "block" : "none";
+      if (e.target.value === "course") document.getElementById("ra_facility").value = "";
+      else document.getElementById("ra_course").value = "";
+    });
+  });
+}
+
 // ─── Record action form ───────────────────────────────────────
 document
   .getElementById("recordActionForm")
@@ -500,21 +571,25 @@ document
     e.preventDefault();
     const msgEl = document.getElementById("raMsg");
     const btn = document.getElementById("recordActionBtn");
-    const course_id = document.getElementById("ra_course").value;
+    
+    const type = document.querySelector('input[name="ra_type"]:checked').value;
+    const target_id = type === "course" ? document.getElementById("ra_course").value : document.getElementById("ra_facility").value;
+    
     const issue_description = document.getElementById("ra_issue").value.trim();
     const action_taken = document.getElementById("ra_action").value.trim();
     const status = document.getElementById("ra_status").value;
 
-    if (!course_id) {
-      showToast("Please select a course.", "warning");
-      return showMsg(msgEl, "Please select a course.", "error");
+    if (!target_id) {
+      showToast(`Please select a ${type}.`, "warning");
+      return showMsg(msgEl, `Please select a ${type}.`, "error");
     }
 
     btn.disabled = true;
     btn.classList.add("btn-loading");
 
     const data = await api("POST", "/admin/action", {
-      course_id: parseInt(course_id),
+      course_id: type === "course" ? parseInt(target_id) : undefined,
+      facility_id: type === "facility" ? parseInt(target_id) : undefined,
       issue_description,
       action_taken,
       status,
@@ -542,7 +617,9 @@ function showMsg(el, msg, type) {
 
 // ─── Init ─────────────────────────────────────────────────────
 showSkeletons();
+setupAdminToggles();
 loadStats();
 loadTrends();
 loadFacultyDropdown();
 loadCoursesForAction();
+loadFacilitiesForAction();

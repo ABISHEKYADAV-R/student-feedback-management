@@ -53,11 +53,25 @@ async function getFeedbackStats(req, res) {
       ORDER BY count DESC
     `);
 
+    // Per-facility stats
+    const [facilityStats] = await db.query(`
+      SELECT
+        fa.facility_id,
+        fa.facility_name,
+        COUNT(f.feedback_id)         AS total_feedback,
+        ROUND(AVG(f.rating), 2)      AS avg_rating
+      FROM facilities fa
+      LEFT JOIN feedback f ON fa.facility_id = f.facility_id
+      GROUP BY fa.facility_id, fa.facility_name
+      ORDER BY avg_rating ASC
+    `);
+
     return res.json({
       success: true,
       stats: {
         totals,
         courseStats,
+        facilityStats,
         totalSuggestions: suggestionCount.total,
         pendingActions: pendingActions.total,
         categoryStats,
@@ -94,12 +108,12 @@ async function getFeedbackTrends(req, res) {
 // POST /admin/action - Record an action taken on a feedback issue
 async function recordAction(req, res) {
   try {
-    const { course_id, issue_description, action_taken, status } = req.body;
+    const { course_id, facility_id, issue_description, action_taken, status } = req.body;
 
-    if (!course_id || !issue_description || !action_taken) {
+    if ((!course_id && !facility_id) || !issue_description || !action_taken) {
       return res.status(400).json({
         success: false,
-        message: "course_id, issue_description, and action_taken are required.",
+        message: "Either course_id or facility_id, issue_description, and action_taken are required.",
       });
     }
 
@@ -107,8 +121,8 @@ async function recordAction(req, res) {
     const actionStatus = validStatuses.includes(status) ? status : "pending";
 
     const [result] = await db.query(
-      "INSERT INTO actions (course_id, issue_description, action_taken, status) VALUES (?, ?, ?, ?)",
-      [course_id, issue_description, action_taken, actionStatus],
+      "INSERT INTO actions (course_id, facility_id, issue_description, action_taken, status) VALUES (?, ?, ?, ?, ?)",
+      [course_id || null, facility_id || null, issue_description, action_taken, actionStatus],
     );
 
     return res.status(201).json({
@@ -131,13 +145,15 @@ async function getActions(req, res) {
       SELECT
         a.action_id,
         c.course_name,
+        fa.facility_name,
         u.name            AS faculty_name,
         a.issue_description,
         a.action_taken,
         a.status,
         a.created_at
       FROM actions a
-      JOIN courses c ON a.course_id = c.course_id
+      LEFT JOIN courses c ON a.course_id = c.course_id
+      LEFT JOIN facilities fa ON a.facility_id = fa.facility_id
       LEFT JOIN users u ON c.faculty_id = u.user_id
     `;
     const params = [];
@@ -248,9 +264,10 @@ async function getFacultyList(req, res) {
 async function getSuggestions(req, res) {
   try {
     const [rows] = await db.query(`
-      SELECT s.suggestion_id, c.course_name, s.suggestion, s.created_at
+      SELECT s.suggestion_id, c.course_name, fa.facility_name, s.suggestion, s.created_at
       FROM suggestions s
-      JOIN courses c ON s.course_id = c.course_id
+      LEFT JOIN courses c ON s.course_id = c.course_id
+      LEFT JOIN facilities fa ON s.facility_id = fa.facility_id
       ORDER BY s.created_at DESC
     `);
     return res.json({ success: true, suggestions: rows });

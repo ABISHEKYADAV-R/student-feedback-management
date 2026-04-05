@@ -103,10 +103,30 @@
         </p>
 
         <form id="feedbackForm">
-          <div class="form-group">
+          <div class="form-group" style="text-align: center; margin-bottom: 20px;">
+            <div class="radio-group" style="display: inline-flex; background: var(--bg-alt); padding: 4px; border-radius: 8px; border: 1px solid var(--border);">
+              <label style="padding: 8px 16px; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 8px; border-radius: 6px;" class="radio-label active" id="lbl_fb_type_course">
+                <input type="radio" name="fb_type" value="course" checked style="display: none;">
+                Course
+              </label>
+              <label style="padding: 8px 16px; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 8px; border-radius: 6px;" class="radio-label" id="lbl_fb_type_facility">
+                <input type="radio" name="fb_type" value="facility" style="display: none;">
+                Facility
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" id="fb_course_group">
             <label for="fb_course">Select Course</label>
-            <select id="fb_course" required>
+            <select id="fb_course">
               <option value="">-- Loading courses... --</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="fb_facility_group" style="display: none;">
+            <label for="fb_facility">Select Facility</label>
+            <select id="fb_facility">
+              <option value="">-- Loading facilities... --</option>
             </select>
           </div>
 
@@ -123,7 +143,7 @@
             <input type="hidden" id="fb_rating" value="" />
           </div>
 
-          <div class="form-group">
+          <div class="form-group" id="fb_category_group">
             <label for="fb_category">Category
               <span style="font-weight: 400; color: var(--text-muted)">(what area is your feedback about?)</span></label>
             <select id="fb_category">
@@ -159,10 +179,30 @@
         </p>
 
         <form id="suggestionForm">
-          <div class="form-group">
+          <div class="form-group" style="text-align: center; margin-bottom: 20px;">
+            <div class="radio-group" style="display: inline-flex; background: var(--bg-alt); padding: 4px; border-radius: 8px; border: 1px solid var(--border);">
+              <label style="padding: 8px 16px; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 8px; border-radius: 6px;" class="radio-label active" id="lbl_sg_type_course">
+                <input type="radio" name="sg_type" value="course" checked style="display: none;">
+                Course
+              </label>
+              <label style="padding: 8px 16px; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 8px; border-radius: 6px;" class="radio-label" id="lbl_sg_type_facility">
+                <input type="radio" name="sg_type" value="facility" style="display: none;">
+                Facility
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" id="sg_course_group">
             <label for="sg_course">Select Course</label>
-            <select id="sg_course" required>
+            <select id="sg_course">
               <option value="">-- Select a course --</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="sg_facility_group" style="display: none;">
+            <label for="sg_facility">Select Facility</label>
+            <select id="sg_facility">
+              <option value="">-- Select a facility --</option>
             </select>
           </div>
 

@@ -20,47 +20,64 @@ CREATE TABLE IF NOT EXISTS courses (
     FOREIGN KEY (faculty_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
+-- Facilities table
+CREATE TABLE IF NOT EXISTS facilities (
+    facility_id   INT AUTO_INCREMENT PRIMARY KEY,
+    facility_name VARCHAR(100) NOT NULL,
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Feedback table (anonymous)
 CREATE TABLE IF NOT EXISTS feedback (
     feedback_id   INT AUTO_INCREMENT PRIMARY KEY,
-    course_id     INT NOT NULL,
+    course_id     INT DEFAULT NULL,
+    facility_id   INT DEFAULT NULL,
     rating        INT NOT NULL CHECK(rating BETWEEN 1 AND 5),
     comment       TEXT,
     category      VARCHAR(50) DEFAULT NULL,
     feedback_date DATE NOT NULL DEFAULT (CURRENT_DATE),
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+    FOREIGN KEY (facility_id) REFERENCES facilities(facility_id) ON DELETE CASCADE,
+    CHECK (course_id IS NOT NULL OR facility_id IS NOT NULL)
 );
 
--- Feedback tracking table (prevents duplicate submissions per student per course)
+-- Feedback tracking table (prevents duplicate submissions per student per course or facility)
 CREATE TABLE IF NOT EXISTS feedback_tracking (
     tracking_id   INT AUTO_INCREMENT PRIMARY KEY,
     student_id    INT NOT NULL,
-    course_id     INT NOT NULL,
+    course_id     INT DEFAULT NULL,
+    facility_id   INT DEFAULT NULL,
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(student_id, course_id),
+    UNIQUE(student_id, facility_id),
     FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+    FOREIGN KEY (facility_id) REFERENCES facilities(facility_id) ON DELETE CASCADE
 );
 
 -- Actions table (admin records actions taken on feedback issues)
 CREATE TABLE IF NOT EXISTS actions (
     action_id         INT AUTO_INCREMENT PRIMARY KEY,
-    course_id         INT NOT NULL,
+    course_id         INT DEFAULT NULL,
+    facility_id       INT DEFAULT NULL,
     issue_description TEXT NOT NULL,
     action_taken      TEXT NOT NULL,
     status            ENUM('pending', 'in-progress', 'resolved') DEFAULT 'pending',
     created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+    FOREIGN KEY (facility_id) REFERENCES facilities(facility_id) ON DELETE CASCADE
 );
 
 -- Suggestions table (anonymous student suggestions)
 CREATE TABLE IF NOT EXISTS suggestions (
     suggestion_id INT AUTO_INCREMENT PRIMARY KEY,
-    course_id     INT NOT NULL,
+    course_id     INT DEFAULT NULL,
+    facility_id   INT DEFAULT NULL,
     suggestion    TEXT NOT NULL,
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+    FOREIGN KEY (facility_id) REFERENCES facilities(facility_id) ON DELETE CASCADE
 );
 
 -- -------------------------------------------------------
@@ -98,3 +115,12 @@ INSERT INTO courses (course_name, faculty_id) VALUES
 ('Cloud Computing',             6),
 ('Machine Learning',            7),
 ('Cyber Security',              7);
+
+INSERT INTO facilities (facility_name) VALUES
+('Hostel & Accommodation'),
+('Mess & Cafeteria'),
+('Restrooms & Hygiene'),
+('Library & Study Spaces'),
+('Sports & Gym'),
+('Campus Wi-Fi & IT'),
+('Transportation & Parking');

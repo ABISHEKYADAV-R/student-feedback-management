@@ -75,6 +75,21 @@ async function loadCourses() {
   document.getElementById("sg_course").innerHTML = prefix + opts;
 }
 
+// ─── Load facilities into dropdowns ───────────────────────────
+async function loadFacilities() {
+  const data = await api("GET", "/student/facilities");
+  const opts =
+    data.facilities && data.facilities.length
+      ? data.facilities
+          .map((f) => `<option value="${f.facility_id}">${escHtml(f.facility_name)}</option>`)
+          .join("")
+      : '<option value="" disabled>No facilities available</option>';
+
+  const prefix = '<option value="">-- Select a facility --</option>';
+  document.getElementById("fb_facility").innerHTML = prefix + opts;
+  document.getElementById("sg_facility").innerHTML = prefix + opts;
+}
+
 // ─── Load categories into dropdown ────────────────────────────
 async function loadCategories() {
   const data = await api("GET", "/student/categories");
@@ -126,6 +141,41 @@ function highlightStars(val) {
   });
 }
 
+// ─── Toggles ──────────────────────────────────────────────────
+function setupToggles() {
+  document.querySelectorAll('input[name="fb_type"]').forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      document.getElementById("lbl_fb_type_course").classList.remove("active");
+      document.getElementById("lbl_fb_type_facility").classList.remove("active");
+      document.getElementById(`lbl_fb_type_${e.target.value}`).classList.add("active");
+
+      document.getElementById("fb_course_group").style.display = e.target.value === "course" ? "block" : "none";
+      document.getElementById("fb_facility_group").style.display = e.target.value === "facility" ? "block" : "none";
+      document.getElementById("fb_category_group").style.display = e.target.value === "course" ? "block" : "none";
+      
+      if (e.target.value === "course") {
+        document.getElementById("fb_facility").value = "";
+      } else {
+        document.getElementById("fb_course").value = "";
+        document.getElementById("fb_category").value = "";
+      }
+    });
+  });
+
+  document.querySelectorAll('input[name="sg_type"]').forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      document.getElementById("lbl_sg_type_course").classList.remove("active");
+      document.getElementById("lbl_sg_type_facility").classList.remove("active");
+      document.getElementById(`lbl_sg_type_${e.target.value}`).classList.add("active");
+
+      document.getElementById("sg_course_group").style.display = e.target.value === "course" ? "block" : "none";
+      document.getElementById("sg_facility_group").style.display = e.target.value === "facility" ? "block" : "none";
+      if (e.target.value === "course") document.getElementById("sg_facility").value = "";
+      else document.getElementById("sg_course").value = "";
+    });
+  });
+}
+
 // ─── Submit Feedback ──────────────────────────────────────────
 document
   .getElementById("feedbackForm")
@@ -133,13 +183,16 @@ document
     e.preventDefault();
     const msgEl = document.getElementById("fbMsg");
     const btn = document.getElementById("fbBtn");
-    const course_id = document.getElementById("fb_course").value;
+    
+    const type = document.querySelector('input[name="fb_type"]:checked').value;
+    const target_id = type === "course" ? document.getElementById("fb_course").value : document.getElementById("fb_facility").value;
+    
     const rating = document.getElementById("fb_rating").value;
     const comment = document.getElementById("fb_comment").value.trim();
     const category = document.getElementById("fb_category").value;
 
-    if (!course_id)
-      return showInline(msgEl, "Please select a course.", "error");
+    if (!target_id)
+      return showInline(msgEl, `Please select a ${type}.`, "error");
     if (!rating)
       return showInline(msgEl, "Please select a star rating.", "error");
 
@@ -147,7 +200,8 @@ document
     btn.classList.add("btn-loading");
 
     const data = await api("POST", "/student/feedback", {
-      course_id: parseInt(course_id),
+      course_id: type === "course" ? parseInt(target_id) : undefined,
+      facility_id: type === "facility" ? parseInt(target_id) : undefined,
       rating: parseInt(rating),
       comment,
       category: category || undefined,
@@ -176,11 +230,12 @@ document
     e.preventDefault();
     const msgEl = document.getElementById("sgMsg");
     const btn = document.getElementById("sgBtn");
-    const course_id = document.getElementById("sg_course").value;
+    const type = document.querySelector('input[name="sg_type"]:checked').value;
+    const target_id = type === "course" ? document.getElementById("sg_course").value : document.getElementById("sg_facility").value;
     const suggestion = document.getElementById("sg_text").value.trim();
 
-    if (!course_id)
-      return showInline(msgEl, "Please select a course.", "error");
+    if (!target_id)
+      return showInline(msgEl, `Please select a ${type}.`, "error");
     if (!suggestion)
       return showInline(msgEl, "Please enter a suggestion.", "error");
 
@@ -188,7 +243,8 @@ document
     btn.classList.add("btn-loading");
 
     const data = await api("POST", "/student/suggestion", {
-      course_id: parseInt(course_id),
+      course_id: type === "course" ? parseInt(target_id) : undefined,
+      facility_id: type === "facility" ? parseInt(target_id) : undefined,
       suggestion,
     });
 
@@ -221,7 +277,7 @@ async function loadImprovements() {
     .map(
       (imp, i) => `
       <div class="improvement-item animate-in" style="animation-delay:${i * 0.06}s">
-        <h4>${escHtml(imp.course_name)}</h4>
+        <h4>${escHtml(imp.course_name || imp.facility_name || 'General')}</h4>
         <p><strong>Issue:</strong> ${escHtml(imp.issue_description)}</p>
         <p><strong>Action taken:</strong> ${escHtml(imp.action_taken)}</p>
         <p class="improvement-meta">Resolved on ${new Date(imp.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>
@@ -239,5 +295,7 @@ function showInline(el, msg, type) {
 }
 
 // ─── Init ─────────────────────────────────────────────────────
+setupToggles();
 loadCourses();
+loadFacilities();
 loadCategories();

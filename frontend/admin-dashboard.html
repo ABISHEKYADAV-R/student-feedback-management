@@ -294,10 +294,30 @@
           Record Action on Feedback Issue
         </h3>
         <form id="recordActionForm">
-          <div class="form-group">
+          <div class="form-group" style="text-align: center; margin-bottom: 20px;">
+            <div class="radio-group" style="display: inline-flex; background: var(--bg-alt); padding: 4px; border-radius: 8px; border: 1px solid var(--border);">
+              <label style="padding: 8px 16px; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 8px; border-radius: 6px;" class="radio-label active" id="lbl_ra_type_course">
+                <input type="radio" name="ra_type" value="course" checked style="display: none;">
+                Course
+              </label>
+              <label style="padding: 8px 16px; cursor: pointer; margin: 0; display: flex; align-items: center; gap: 8px; border-radius: 6px;" class="radio-label" id="lbl_ra_type_facility">
+                <input type="radio" name="ra_type" value="facility" style="display: none;">
+                Facility
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" id="ra_course_group">
             <label for="ra_course">Select Course</label>
-            <select id="ra_course" required>
+            <select id="ra_course">
               <option value="">-- Select a course --</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="ra_facility_group" style="display: none;">
+            <label for="ra_facility">Select Facility</label>
+            <select id="ra_facility">
+              <option value="">-- Select a facility --</option>
             </select>
           </div>
           <div class="form-group">
